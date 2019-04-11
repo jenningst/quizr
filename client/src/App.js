@@ -1,17 +1,18 @@
 import React, { Component } from 'react';
-import './App.css';
 // import Dashboard from './components/Dashboard';
 // import EditQuestion from './components/EditQuestion';
+import styled from 'styled-components';
 import Quiz from './components/Quiz';
 
-class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <Quiz />
-      </div>
-    );
-  }
-}
+const App = () => {
+  return (
+    <AppWrapper>
+      <Quiz />
+    </AppWrapper>
+  );
+};
+
+const AppWrapper = styled.div`
+`;
 
 export default App;

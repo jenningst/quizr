@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import Button from './common/Button';
+import styled from 'styled-components';
+import ButtonBase from './common/base/ButtonBase';
 import AnswerItem from './AnswerItem';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
@@ -12,22 +13,18 @@ const Quiz = () => {
   const [message, setMessage] = useState("");
 
   return (
-    <div>
+    <QuizWrapper>
       <h1>Quiz</h1>
-      <div>
-        <Button
-          type="button"
-          onClick={toggleAssistMode}
-        >
-          {assistMode ? "Disable Assist Mode" : "Enable Assist Mode"}
-        </Button>
-      </div>
+      <ButtonBase type="button" onClick={toggleAssistMode}>
+        {assistMode ? "Disable Assist Mode" : "Enable Assist Mode"}
+      </ButtonBase>
       <div className="answer-box">
         {message}
       </div>
       <div className="question-title">
         <h2>{SAMPLE_QUESTION.title}</h2>
       </div>
+
       {SAMPLE_QUESTION.choices.map((choice, index) => (
         <AnswerItem
           key={index}
@@ -37,13 +34,10 @@ const Quiz = () => {
           toggleIsChoice={selectChoice}
         />
       ))}
-      <Button
-        type="button"
-        onClick={checkAnswer}
-      >
+      <ButtonBase type="button" onClick={checkAnswer}>
         Submit Answer
-      </Button>
-    </div>
+      </ButtonBase>
+    </QuizWrapper>
   );
 
   function selectChoice(index) {
@@ -131,7 +125,15 @@ const Quiz = () => {
       });
     return answerIndexes;
   }
-}
+};
+
+const QuizWrapper = styled.div`
+  background: #f7f8fb;
+`;
+
+const AnswerListWrapper = styled.section`
+  
+`;
 
 const SAMPLE_QUESTION = {
   "title":"What is 1 + 1?",
