@@ -1,32 +1,41 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import styled from "styled-components";
 import PropTypes from "prop-types"; 
 
-const Portal = ({ children }) => {  
-  const modalRoot = document.getElementById("modal-root");
-  const el = document.createElement("div");
-  // append our child to the DOM
+const Portal = ({ id, children }) => {
+  const el = 
+    useRef(document.getElementById(id) || 
+    document.createElement("div"));
+
+  const [dynamic] = useState(!el.current.parentElement);
+
   useEffect(() => {
-    modalRoot.appendChild(el);
-  }, []);
-  // remove our child from the DOM
-  useEffect(() => {
-    return () => modalRoot.removeChild(el); 
-  });
-  return createPortal(children, el);
+    if (dynamic) {
+      el.current.id = id;
+      document.body.appendChild(el.current);
+    }
+    return () => {
+      if (dynamic && el.current.parentElement) {
+        el.current.parentElement.removeChild(el.current);
+      }
+    }
+  }, [id]);
+
+  return createPortal(children, el.current);
 };
 
-const Modal = ({ children, toggle, open }) => (
-  <Portal>
+const Modal = ({ id, children, toggle, open }) => (
+  <Portal id={id}>
     {open && (
       <ModalWrapper>
         <ModalCard>
           <CloseButton onClick={toggle}>
             <img src="https:icon.now.sh/x/ff0000" alt="close" />
-            {children}
           </CloseButton>
+          {children}
         </ModalCard>
+        <Background onClick={toggle} />
       </ModalWrapper>
     )}
   </Portal>
@@ -35,6 +44,7 @@ const Modal = ({ children, toggle, open }) => (
 export default Modal;
 
 Modal.propTypes = {
+  id: PropTypes.string.isRequired,
   children: PropTypes.arrayOf(PropTypes.object).isRequired,
   toggle: PropTypes.func.isRequired,
   open: PropTypes.bool.isRequired,
@@ -42,33 +52,33 @@ Modal.propTypes = {
 
 const ModalWrapper = styled.div`
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;  height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
 `;
 
 const ModalCard = styled.div`
-  position: relative;
-  min-width: 320px;
+  position: fixed;
+  height: auto;
+  width: 80%;
   z-index: 10;
-  margin-bottom: 100px;
   background: white;
-  border-radius: 5px;
-  padding: 15px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid red;
+  padding: 1em;
+  margin: 0;
 `; 
 
 const CloseButton = styled.button`
   position: absolute;
-  top: 0;
-  right: 0;
+  top: 1em;
+  right: 1em;
   border: none;
   background: transparent;
-  padding: 10px;
+  padding: 1em;
   &:hover {
     cursor: pointer;
   }`; 
