@@ -5,7 +5,7 @@ const Button = styled.button`
   background: ${props => props.primary ? "#5e23be" : "#ffffff"};
   border: 2px solid #5e23be;
   font-size: .75em;
-  font-family: Roboto;
+  font-family: 'Montserrat', sans-serif;
   padding: 0.5em 1em;
   border-radius: 3px;
 `;

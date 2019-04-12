@@ -13,6 +13,7 @@ const App = () => {
 };
 
 const AppWrapper = styled.div`
+  color: white;
 `;
 
 export default App;

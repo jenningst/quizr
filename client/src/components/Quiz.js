@@ -14,31 +14,49 @@ const Quiz = () => {
 
   return (
     <QuizWrapper>
-      <h1>Quiz</h1>
-      <ButtonBase type="button" onClick={toggleAssistMode}>
-        {assistMode ? "Disable Assist Mode" : "Enable Assist Mode"}
-      </ButtonBase>
-      <div className="answer-box">
+      <QuestionTitle className="question-title">
+        {SAMPLE_QUESTION.title}
+      </QuestionTitle>
+      <AnswerListWrapper className="answer-list">
+        {SAMPLE_QUESTION.choices.map((choice, index) => (
+          <AnswerItem
+            key={index}
+            index={index}
+            choiceText={choice.text}
+            isSelected={selectedChoices.includes(index) ? true : false}
+            toggleIsChoice={selectChoice}
+          />
+        ))}
+        <ActionWrapper className="action-buttons">
+          {renderSubmitOrNext()}
+        </ActionWrapper>
+      </AnswerListWrapper>
+      <MessageWrapper className="message-box">
         {message}
-      </div>
-      <div className="question-title">
-        <h2>{SAMPLE_QUESTION.title}</h2>
-      </div>
-
-      {SAMPLE_QUESTION.choices.map((choice, index) => (
-        <AnswerItem
-          key={index}
-          index={index}
-          choiceText={choice.text}
-          isSelected={selectedChoices.includes(index) ? true : false}
-          toggleIsChoice={selectChoice}
-        />
-      ))}
-      <ButtonBase type="button" onClick={checkAnswer}>
-        Submit Answer
-      </ButtonBase>
+      </MessageWrapper>
     </QuizWrapper>
   );
+
+  function renderSubmitOrNext() {
+    if (selectedChoices.length > 0) { // at least once choice selected
+      if (isCorrect === true) { // the question is correct
+        //render next question button
+        return (
+          <ActionButton backgroundColor="#6121bf" type="button" onClick={nextQuestion}>
+            Next Question
+          </ActionButton>
+        );
+      } else {
+        // render submit current question button
+        return (
+          <ActionButton type="button" onClick={checkAnswer}>
+            Submit
+          </ActionButton>
+        );
+      }
+    }
+    return null;
+  }
 
   function selectChoice(index) {
     // adds/removes a choice selection and updates local state
@@ -125,14 +143,47 @@ const Quiz = () => {
       });
     return answerIndexes;
   }
+
+  function nextQuestion() {
+    // load next quetion
+  }
 };
 
 const QuizWrapper = styled.div`
-  background: #f7f8fb;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #34495E;
 `;
 
 const AnswerListWrapper = styled.section`
-  
+  width: 90%;
+`;
+
+const ActionWrapper = styled.div`
+  height: 5em;
+  width: 100%;
+`;
+
+const MessageWrapper = styled.section`
+  height: 5em;
+`;
+
+const QuestionTitle = styled.h1`
+  font-family: 'Montserrat', sans-serif;
+`;
+
+const ActionButton = styled(ButtonBase)`
+  width: 100%;
+  height: 4em;
+  background: ${props => props.backgroundColor || "#4ACAB0"};
+  border: 2px solid #627284;
+  color: #ffffff;
+  font-size: 1em;
+  font-weight: 700;
+  outline: none;
 `;
 
 const SAMPLE_QUESTION = {

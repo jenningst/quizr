@@ -7,7 +7,7 @@ import ButtonBase from './common/base/ButtonBase';
 const AnswerItem = ({ index, choiceText, isSelected, toggleIsChoice }) => {  
   
   return (
-    <AnswerWrapper key={index}>
+    <>
       {isSelected ? (
         <LargeButton
           primary
@@ -24,7 +24,7 @@ const AnswerItem = ({ index, choiceText, isSelected, toggleIsChoice }) => {
           </LargeButton>
         )
       }
-    </AnswerWrapper>
+    </>
   );  
 };
 
@@ -37,17 +37,13 @@ const AnswerWrapper = styled.div`
 const LargeButton = styled(ButtonBase)`
   width: 100%;
   height: 4em;
-  margin: .25em;
-  background: ${props => props.primary ? "#f7f8fb" : "#ffffff"};
-  border: grey;
-  color: ${props => props.primary ? "#9933ff" : "#312c44"};
+  margin-bottom: .25em;
+  background: none;
+  border: ${props => props.primary ? "2px solid #4ACAB0" : "2px solid #627284"};
+  color: ${props => props.primary ? "#4ACAB0" : "#fff"};
   font-size: 1em;
   font-weight: ${props => props.primary ? "700" : "400"};
-`;
-
-const CircleDiv = styled.div`
-  border-radius: 50%;
-  border: ${props => props.primary ? "2px solid #312c44" : "2px solide #9933ff"};
+  outline: none;
 `;
 
 AnswerItem.propTypes = {
