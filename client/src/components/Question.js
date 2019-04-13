@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import styled, { ThemeConsumer } from 'styled-components';
+import styled from 'styled-components';
 import ButtonBase from './common/base/ButtonBase';
 import AnswerItem from './AnswerItem';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
 
-const Question = ({ question, getNextQuestion }) => {  
+const Question = ({ question, getNextQuestion, isCorrect }) => {  
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [assistMode, setAssistMode] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [mode, setMode] = useState(false);
+  // const [isCorrect, setIsCorrect] = useState(false);
   const [message, setMessage] = useState("");
 
   return (
@@ -89,18 +90,19 @@ const Question = ({ question, getNextQuestion }) => {
     const ANSWERS = getAnswers(); // answers = [2]
 
     function onError() {
-      setIsCorrect(false);
+      // setIsCorrect(false);
       setMessage(ERROR_MESSAGE);
       setSelectedChoices([]);
     }
 
     function onSuccess() {
-      setIsCorrect(true);
+      // setIsCorrect(true);
       setMessage(SUCCESS_MESSAGE);
     }
 
-    if (assistMode === false) { // assist mode disabled
-      if (choices.length !== ANSWERS.length) {
+    if (assistMode === false) { // REFACTOR: Change this to reflect test mode
+
+      if (choices.length !== ANSWERS.length) { // check for length equality
         onError();
         return;
       } else { // same number of answers
@@ -145,7 +147,7 @@ const Question = ({ question, getNextQuestion }) => {
     getNextQuestion();
     // re-initialize state
     setSelectedChoices([]);
-    setIsCorrect(false);
+    // setIsCorrect(false);
     setMessage("");
   }
 
