@@ -23,7 +23,7 @@ const Quiz = () => {
 
   return (
     <QuizWrapper>
-      <h1>You have {attemptCounter} attemps left</h1>
+      <h1>You have {attemptCounter} attempts left</h1>
       {index && index === questions.length
         ? <Assessment
           />
@@ -42,36 +42,32 @@ const Quiz = () => {
 
   function checkAnswer(choicePayload) {
     // Checks the validity of a choices payload from Question
-    // reduce attempts
-    setAttemptCounter(attemptCounter - 1);
-
-    let choices = choicePayload;
+  
+    // setup choices and answers for comparison
+    const CHOICES = choicePayload;
     const ANSWERS = getAnswers();
 
     const onError = () => {
-      // setMessage(ERROR_MESSAGE);
-      setCorrect(false);
-      
+      // reduce attempts and re-render
+      setAttemptCounter(attemptCounter - 1);
     }
 
     const onSuccess = () => {
-      // setMessage(SUCCESS_MESSAGE);
+      // update correct to true and re-render
       setCorrect(true);
-      setAttemptCounter(3);
     }
     
-    if (choices.length !== ANSWERS.length) { // check for length equality
+    if (CHOICES.length !== ANSWERS.length) { // check for length equality
       onError();
       return;
     } else { // same number of answers
-      if (ANSWERS.every(answer => choices.includes(answer))) {
+      if (ANSWERS.every(answer => CHOICES.includes(answer))) {
         onSuccess();
         return;
       }
       onError();
       return;
-    }
-    
+    }    
     //let correct, incorrect, missing;
     // loop through the answers:
     // if answers.includes(THE VALUE, NOT INDEX) === true:
@@ -110,8 +106,12 @@ const Quiz = () => {
   }
 
   function getNextQuestion() {
+    // increment the index to get the next question and re-render
     setIndex(index + 1);
+    // reset correct to false and re-render
     setCorrect(false);
+    // reset attemptCounter to 3
+    setAttemptCounter(3);
   }
 };
 
