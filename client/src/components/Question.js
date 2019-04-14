@@ -8,23 +8,29 @@ const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
 const NO_CHOICE_MADE = "You need to select at least 1 choice."
 
-const Question = ({ question, submitResponses, isCorrect, getNextQuestion, attemptsLeft }) => {   
+const Question = ({ 
+  question,
+  gradeResponse,
+  retries,
+  isCorrect,
+  getNextQuestion,
+  remainingAttempts,
+}) => {   
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
   const [cumulativeSelections, setCumulativeSelections] = useState(0);
   
   useEffect(() => {
     function renderMessage() { setMessage(ERROR_MESSAGE) };
-    if (attemptsLeft < 3) { renderMessage() };
+    if (remainingAttempts < 3) { renderMessage() };
     // answer was wrong and attempsLeft has updated; reset local choices
     setSelectedChoices([]);
-  }, [attemptsLeft]);
+  }, [remainingAttempts]);
 
   useEffect(() => {
     function renderMessage() {
       if (isCorrect) { setMessage(SUCCESS_MESSAGE) };
     }
-    // isCorrect
     renderMessage();
   }, [isCorrect]);
 
@@ -70,15 +76,20 @@ const Question = ({ question, submitResponses, isCorrect, getNextQuestion, attem
 
   // Submits an array of selected choices for validation
   function submitChoices() {
-    // if no selections have been made, alert
-    if (selectedChoices.length < 1) {
-      setMessage(NO_CHOICE_MADE);
-      return;
+    if (retries) {
+      // if no selections have been made, alert
+      if (selectedChoices.length < 1) {
+        setMessage(NO_CHOICE_MADE);
+        return;
+      }
+      // send all selected choices to parent
+      gradeResponse(selectedChoices);
+      // allow message to be shown
+      setCumulativeSelections(0); 
+    } else {
+      gradeResponse(selectedChoices);
+      fetchNextQuestion();
     }
-    // send all selected choices to parent
-    submitResponses(selectedChoices);
-    // allow message to be shown
-    setCumulativeSelections(0); 
   }
 
   // Adds or removes a element from the selectedChoices state
@@ -115,10 +126,10 @@ Question.propTypes = {
     choices: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
   }).isRequired,
-  submitResponses: PropTypes.func.isRequired,
+  gradeResponse: PropTypes.func.isRequired,
   isCorrect: PropTypes.bool.isRequired,
   getNextQuestion: PropTypes.func.isRequired,
-  attemptsLeft: PropTypes.number.isRequired,
+  remainingAttempts: PropTypes.number.isRequired,
 };
 
 export default Question;

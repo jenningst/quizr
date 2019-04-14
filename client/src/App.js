@@ -1,7 +1,7 @@
-import React, { Component } from 'react';
+import React from 'react';
 // import Dashboard from './components/Dashboard';
 // import EditQuestion from './components/EditQuestion';
-import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import Quiz from './components/Quiz';
 
 const App = () => {
@@ -13,18 +13,6 @@ const App = () => {
 };
 
 const AppWrapper = styled.div`
-`;
-
-const GlobalStyle = createGlobalStyle`
-  mintyTheme {
-    primaryBackground: "#46596C",
-    primaryColor: "#FFFFFF",
-    primaryBorder: "#627284",
-    secondaryBackground: "#34495E",
-    secondaryColor: "",
-    secondaryBorder: "",
-    highlightColor: "#6121BF"
-  }
 `;
 
   /* 

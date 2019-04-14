@@ -9,10 +9,9 @@ const Quiz = () => {
   // state for all modes
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
-  const [message, setMessage] = useState("");
   // state for intensive mode
-  const [mode, setMode] = useState(MODES.INTENSIVE_MODE);
-  const [correct, setCorrect] = useState(false);
+  const [mode, setMode] = useState(MODES.PREP_MODE);
+  const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [attemptCounter, setAttemptCounter] = useState(3);
 
@@ -23,75 +22,62 @@ const Quiz = () => {
 
   return (
     <QuizWrapper>
-      <h1>You have {attemptCounter} attempts left</h1>
+      <h1>Question {index + 1} of {questions.length}</h1>
+      {mode.RETRIES && <h1>You have {attemptCounter} attempts left</h1>}
       {index && index === questions.length
         ? <Assessment
+            score={correctCount}
+            totalPossible={questions.length}
           />
         : attemptCounter > 0
             ?  <Question
                   question={SAMPLE_QUESTIONS[index]}
+                  gradeResponse={gradeResponse}
+                  retries={mode.RETRIES}
+                  isCorrect={isSubmissionCorrect}
                   getNextQuestion={getNextQuestion}
-                  isCorrect={correct}
-                  submitResponses={checkAnswer}
-                  attemptsLeft={attemptCounter}
+                  remainingAttempts={attemptCounter}
               />
             : <h1>No attemps left!</h1>
       }
     </QuizWrapper>
   );
 
-  function checkAnswer(choicePayload) {
+  // REFACTOR: make this async on the server
+  function gradeResponse(choicePayload) {
     // Checks the validity of a choices payload from Question
-  
-    // setup choices and answers for comparison
-    const CHOICES = choicePayload;
     const ANSWERS = getAnswers();
+    const IS_CORRECT = objectsAreEqual(ANSWERS, choicePayload);
 
-    const onError = () => {
-      // reduce attempts and re-render
-      setAttemptCounter(attemptCounter - 1);
-    }
-
-    const onSuccess = () => {
-      // update correct to true and re-render
-      setCorrect(true);
-    }
-    
-    if (CHOICES.length !== ANSWERS.length) { // check for length equality
-      onError();
-      return;
-    } else { // same number of answers
-      if (ANSWERS.every(answer => CHOICES.includes(answer))) {
-        onSuccess();
+    if (mode.REPORT === "SET") {
+      if (IS_CORRECT) { 
+        setIsSubmissionCorrect(true); // mark as correct
+        setCorrectCount(correctCount + 1); // update correct count
         return;
       }
-      onError();
-      return;
-    }    
-    //let correct, incorrect, missing;
-    // loop through the answers:
-    // if answers.includes(THE VALUE, NOT INDEX) === true:
-    //   push the correct answer to correct
-    //   remove the correct answer from choices
-    // else:
-    //   push the missing answer to missing
-    // finally:
-    //   anything left over in choices gets concatenated into incorrect
+    } else if (mode.REPORT === "QUESTION") {
+      if (IS_CORRECT) {
+        setIsSubmissionCorrect(true); // mark as correct
+        setCorrectCount(correctCount + 1); // update correct count
+        return;
+      }
+      setAttemptCounter(attemptCounter - 1); // decrement attempts
+    } else if (mode.REPORT === "NONE") {
+      if (IS_CORRECT) {
+        
+      }
+    }
+  }
 
-    // invalid cases:
-    // partial incorrect (missing one or more correct)
-    //    answer = [1, 2, 3]; choices = [1, 2]
-    //    display incorrect to user
-    //    show them correct answers [1, 2]
-    //    show them incorrect answers [3]
-    // partial incorrect (extraneous selection)
-    //    answer = [1, 3]; choices = [1, 2, 3]
-    //    show them correct answers [1, 3]
-    //    show them incorrect answers [2]
-    // all incorrect
-    //    answer = [2, 4]; choices = [0, 1, 3]
-    //    show them correct answers []
-    //    show them incorrect answers [0, 1, 3]
+  function objectsAreEqual(a, b) {
+    // Compares two arrays for equality
+    if (a.length === b.length) {
+      // go through each response
+      if (a.every(item => b.includes(item))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   function getAnswers() {
@@ -106,12 +92,13 @@ const Quiz = () => {
   }
 
   function getNextQuestion() {
-    // increment the index to get the next question and re-render
-    setIndex(index + 1);
-    // reset correct to false and re-render
-    setCorrect(false);
-    // reset attemptCounter to 3
-    setAttemptCounter(3);
+    // Gets the next question object
+
+    if (index < questions.length) {
+      setIndex(index + 1); // increment the index; re-render
+    }
+    setIsSubmissionCorrect(false); // reset correct to false and re-render
+    setAttemptCounter(3); // reset attemptCounter to 3
   }
 };
 
@@ -120,11 +107,3 @@ const QuizWrapper = styled.div`
 `;
 
 export default Quiz;
-
-// function fetchQuestion() {
-//   getNextQuestion();
-//   // re-initialize state
-//   setSelectedChoices([]);
-//   // setIsCorrect(false);
-//   setMessage("");
-// }
