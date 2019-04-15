@@ -3,11 +3,12 @@ import React from 'react';
 // import EditQuestion from './components/EditQuestion';
 import styled from 'styled-components';
 import Quiz from './components/Quiz';
+import { MODES } from './constants/quizModes';
 
 const App = () => {
   return (
     <AppWrapper>
-      <Quiz />
+      <Quiz mode={MODES.PREP_MODE}/>
     </AppWrapper>
   );
 };

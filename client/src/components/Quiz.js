@@ -2,16 +2,14 @@ import React, { useState, useEffect } from 'react';
 import Question from './Question';
 import AnswerKey from './AnswerKey';
 import Assessment from './Assessment';
-// import ButtonBase from './common/base/ButtonBase';
 import styled from 'styled-components';
 import { SAMPLE_QUESTIONS } from '../constants/sampleQuestions';
-import { MODES } from '../constants/quizModes';
+
 import { objectsAreEqual } from '../utilities/helpers'; 
 
-const Quiz = () => {
+const Quiz = ({ mode }) => {
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
-  const [mode] = useState(MODES.PREP_MODE);
   const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [attemptCounter, setAttemptCounter] = useState(mode.ATTEMPTS);
@@ -36,11 +34,11 @@ const Quiz = () => {
           />
         : attemptCounter > 0
             ?  <Question
-                  question={SAMPLE_QUESTIONS[index]}
+                  questionData={SAMPLE_QUESTIONS[index]}
                   gradeResponse={gradeResponse}
-                  retries={mode.ATTEMPTS}
-                  feedback={mode.FEEDBACK}
-                  isCorrect={isSubmissionCorrect}
+                  totalAttemptsAllowed={mode.ATTEMPTS}
+                  isFeedbackEnabled={mode.FEEDBACK}
+                  isAnswerCorrect={isSubmissionCorrect}
                   getNextQuestion={getNextQuestion}
                   remainingAttempts={attemptCounter}
               />
@@ -111,13 +109,3 @@ const QuizWrapper = styled.div`
   background: #46596C;
 `;
 
-// const ActionButton = styled(ButtonBase)`
-//   width: 100%;
-//   height: 4em;
-//   background: ${props => props.backgroundColor || "#4ACAB0"};
-//   border: 2px solid ${props => props.borderColor || "#1ABC9C"};
-//   color: ${props => props.primaryColor || "#FFFFFF"};
-//   font-size: 1em;
-//   font-weight: 700;
-//   outline: none;
-// `;

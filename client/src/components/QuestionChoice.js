@@ -1,32 +1,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-// import Button from './common/Button';
 import ButtonBase from './common/base/ButtonBase';
 
-const QuestionChoice = ({ index, choiceText, isSelected, toggleIsChoice }) => {  
+const QuestionChoice = ({
+  index,
+  choiceText,
+  isSelected,
+  toggleIsSelected
+}) => {
   
   return (
     <>
       {isSelected ? (
         <LargeButton
           primary
-          onClick={e => toggleIsChoice(index)}
+          onClick={e => toggleIsSelected(index)}
         >
           {choiceText}
         </LargeButton>
         ) : (
           <LargeButton
             type="button"
-            onClick={e => toggleIsChoice(index)}
+            onClick={e => toggleIsSelected(index)}
           >
             {choiceText}
           </LargeButton>
         )
       }
     </>
-  );  
+  );
 };
+
+QuestionChoice.propTypes = {
+  index: PropTypes.number.isRequired,
+  choiceText: PropTypes.string.isRequired,
+  isSelected: PropTypes.bool.isRequired,
+  toggleIsSelected: PropTypes.func,
+};
+
+QuestionChoice.defaultProps = {
+  toggleIsSelected: null,
+}
+
+export default QuestionChoice;
 
 const LargeButton = styled(ButtonBase)`
   width: 100%;
@@ -39,16 +56,3 @@ const LargeButton = styled(ButtonBase)`
   font-weight: ${props => props.primary ? "700" : "400"};
   outline: none;
 `;
-
-QuestionChoice.propTypes = {
-  index: PropTypes.number.isRequired,
-  choiceText: PropTypes.string.isRequired,
-  isSelected: PropTypes.bool.isRequired,
-  toggleIsChoice: PropTypes.func,
-};
-
-QuestionChoice.defaultProps = {
-  toggleIsChoice: null,
-}
-
-export default QuestionChoice;

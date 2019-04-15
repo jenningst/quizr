@@ -9,56 +9,58 @@ const SUCCESS_MESSAGE = "That's correct!";
 const NO_CHOICE_MADE = "You need to select at least 1 choice."
 
 const Question = ({ 
-  question,
-  gradeResponse,
-  retries,
-  feedback,
-  isCorrect,
-  getNextQuestion,
+  questionData,
+  totalAttemptsAllowed,
   remainingAttempts,
+  gradeResponse,
+  isFeedbackEnabled,
+  isAnswerCorrect,
+  getNextQuestion,
 }) => {
+  // Local state for managing 
+  // (a) choice selection
+  // (b) whether to display feedback to the user
+  // (c) feedback text
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
   const [shouldDisplayMessage, setShouldDisplayMessage] = useState(0);
-  
+
+  // Renders error message and clear inputs if question was answered wrong
   useEffect(() => {
-    // Renders an error message if remainingAttempts changes
-    // Clears selection if remainingAttemps changes
     function renderMessage() { setMessage(ERROR_MESSAGE) };
-    // if remaining attempts === retries, question is being rendered for the 
+    // if remaining attempts === totalAttemptsAllowed, questionData is being rendered for the 
     // first time; if on 1 + Nth attempt, allow rendering of a message to user
-    if (remainingAttempts !== retries && feedback) { 
+    if (remainingAttempts !== totalAttemptsAllowed && isFeedbackEnabled) { 
       renderMessage();
     };
     setSelectedChoices([]);
   }, [remainingAttempts]);
 
+  // Render a success message if question was answered right
   useEffect(() => {
-    // Render a success message if isCorrect changes (to true) 
-    // and feedback is enabled
     function renderMessage() {
-      if (isCorrect && feedback) { setMessage(SUCCESS_MESSAGE) };
+      if (isAnswerCorrect && isFeedbackEnabled) { setMessage(SUCCESS_MESSAGE) };
     }
     renderMessage();
-  }, [isCorrect]);
+  }, [isAnswerCorrect]);
 
   return (
     <QuestionWrapper className="question-wrapper">
       <QuestionTitle className="question-title">
-        {question.title}
+        {questionData.title}
       </QuestionTitle>
       <ChoiceBank className="choice-list">
-        {question.choices.map((choice, index) => (
+        {questionData.choices.map((choice, index) => (
           <QuestionChoice
             key={index}
             index={index}
             choiceText={choice.text}
             isSelected={selectedChoices.includes(index) ? true : false}
-            toggleIsChoice={selectChoice}
+            toggleIsSelected={selectChoice}
           />
         ))}
         <ActionWrapper className="action-buttons">
-          {isCorrect
+          {isAnswerCorrect
             ? <ActionButton 
                 backgroundColor="#6121bf"
                 borderColor="#4717a2"
@@ -84,16 +86,18 @@ const Question = ({
 
   // Submits an array of selected choices for validation
   function submitChoices() {
-    // if no selections have been made, alert
+    // no selections have been made, update feedback message
     if (selectedChoices.length < 1) {
       setMessage(NO_CHOICE_MADE);
       return;
     }
-    // if feedback disabled; grade response and get next question
-    if (feedback) {
+    // start grading
+    if (isFeedbackEnabled) {
+      // grade the response and allow user to see feedback message
       gradeResponse(selectedChoices);
       setShouldDisplayMessage(0); 
     } else {
+      // grade response and immediately get next question (i.e. skip feedback)
       gradeResponse(selectedChoices);
       fetchNextQuestion();
     }
@@ -102,41 +106,34 @@ const Question = ({
   // Adds or removes a element from the selectedChoices state
   function selectChoice(index) {
     let selections = [...selectedChoices];
-    if (!selections.includes(index)) { // selection not in state; add it
-      selections.push(index);
-    } else { // selection in state; remove it
-      if (selections.length === 1) {
-        selections = [];
-      }
-      selections.splice(selections.indexOf(index), 1);
-    }
+    // determine if we should add or remove the selection (i.e. toggle it)
+    !selections.includes(index) 
+      ? selections.push(index)
+      : selections.splice(selections.indexOf(index), 1);
     // update state with element added or removed
     setSelectedChoices(selections);
     setShouldDisplayMessage(shouldDisplayMessage + 1);
+    return;
   }
 
-  // Sets a request to Quiz for the next question
+  // fetches the next question in a set
   function fetchNextQuestion() {
-    // reset our selected choices
-    setSelectedChoices([]);
-    // reset our cumulative selections
-    setShouldDisplayMessage(0);
-    // reset our messages
-    setMessage("");
-    // ask for the next question
-    getNextQuestion();
+    setSelectedChoices([]); // clean up any selected choices
+    setShouldDisplayMessage(0); // reset feedback to show
+    setMessage(""); // clean up any feedback
+    getNextQuestion(); // get next question in set
   }
 };
 
 Question.propTypes = {
-  question: PropTypes.shape({
+  questionData: PropTypes.shape({
     choices: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
   }).isRequired,
   gradeResponse: PropTypes.func.isRequired,
-  retries: PropTypes.number.isRequired,
-  feedback: PropTypes.bool.isRequired,
-  isCorrect: PropTypes.bool.isRequired,
+  totalAttemptsAllowed: PropTypes.number.isRequired,
+  isFeedbackEnabled: PropTypes.bool.isRequired,
+  isAnswerCorrect: PropTypes.bool.isRequired,
   getNextQuestion: PropTypes.func.isRequired,
   remainingAttempts: PropTypes.number.isRequired,
 };

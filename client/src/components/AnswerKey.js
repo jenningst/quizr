@@ -4,7 +4,10 @@ import styled from 'styled-components';
 import ButtonBase from './common/base/ButtonBase';
 import QuestionChoice from './QuestionChoice';
 
-const AnswerKey = ({ answerKey, getNextQuestion }) => {
+const AnswerKey = ({
+  answerKey,
+  getNextQuestion
+}) => {
   return (
     <AnswerKeyWrapper className="answer-key-wrapper">
       <QuestionTitle className="question-title">
@@ -31,7 +34,6 @@ const AnswerKey = ({ answerKey, getNextQuestion }) => {
         </ActionWrapper>
       </AnswerBank>
       <MessageBox className="message-box">
-
       </MessageBox>
     </AnswerKeyWrapper>
   );
