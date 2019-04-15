@@ -23,14 +23,12 @@ const AnswerKey = ({
           />
         ))}
         <ActionWrapper className="action-buttons">
-          <ActionButton 
-            backgroundColor="#6121bf"
-            borderColor="#4717a2"
+          <ActionButtonHighlighted 
             type="button" 
             onClick={getNextQuestion}
           >
             Next Question
-          </ActionButton>
+          </ActionButtonHighlighted>
         </ActionWrapper>
       </AnswerBank>
       <MessageBox className="message-box">
@@ -55,13 +53,22 @@ const AnswerKeyWrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: #E6E7FF;
 `;
 
 const AnswerBank = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
   width: 90%;
 `;
 
 const ActionWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;  
   height: 5em;
   width: 100%;
 `;
@@ -72,16 +79,29 @@ const MessageBox = styled.section`
 
 const QuestionTitle = styled.h1`
   font-family: 'Montserrat', sans-serif;
-  color: #FFFFFF;
 `;
 
 const ActionButton = styled(ButtonBase)`
-  width: 100%;
+  width: 90%;
   height: 4em;
-  background: ${props => props.backgroundColor || "#4ACAB0"};
-  border: 2px solid ${props => props.borderColor || "#1ABC9C"};
-  color: ${props => props.primaryColor || "#FFFFFF"};
+  margin-top: 1em;
   font-size: 1em;
   font-weight: 700;
+  background: #FFFFFF;
+  color: #FFB3B3;
+  border: none;
   outline: none;
+
+  &:hover {
+    border: 2px solid #FFE6E6;
+  }
+`;
+
+const ActionButtonHighlighted = styled(ActionButton)`
+  background: #ffcc99;
+  color: #FFFFFF;
+
+  &:hover {
+    border: none;
+  }
 `;

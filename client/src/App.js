@@ -16,13 +16,4 @@ const App = () => {
 const AppWrapper = styled.div`
 `;
 
-  /* 
-  Light Sea Green: #1ABC9C
-  Eucalyptus:      #4ACAB0
-  Black:           #000000
-  Charcoal:        #34495E
-  Payne's Grey     #5D67E
-  Blue Grey        #627284
-  */
-
 export default App;

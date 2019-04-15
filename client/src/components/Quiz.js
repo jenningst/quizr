@@ -106,6 +106,6 @@ const Quiz = ({ mode }) => {
 export default Quiz;
 
 const QuizWrapper = styled.div`
-  background: #46596C;
+  background: #FFFFFF;
+  color: #8B90FF
 `;
-

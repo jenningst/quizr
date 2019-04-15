@@ -24,6 +24,7 @@ const Question = ({
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
   const [shouldDisplayMessage, setShouldDisplayMessage] = useState(0);
+  const allowSubmit = selectedChoices.length > 0;
 
   // Renders error message and clear inputs if question was answered wrong
   useEffect(() => {
@@ -60,22 +61,7 @@ const Question = ({
           />
         ))}
         <ActionWrapper className="action-buttons">
-          {isAnswerCorrect
-            ? <ActionButton 
-                backgroundColor="#6121bf"
-                borderColor="#4717a2"
-                type="button" 
-                onClick={fetchNextQuestion}
-              >
-                Next Question
-              </ActionButton>
-            : <ActionButton
-                type="button" 
-                onClick={submitChoices}
-              >
-                Submit
-              </ActionButton>
-          }
+          {renderButton()}
         </ActionWrapper>
       </ChoiceBank>
       <MessageBox className="message-box">
@@ -84,13 +70,39 @@ const Question = ({
     </QuestionWrapper>
   );
 
+  // Renders a button based on state
+  function renderButton() {
+    if (allowSubmit) {
+      if (isAnswerCorrect) {
+        return (
+          <ActionButtonHighlighted 
+            type="button" 
+            onClick={fetchNextQuestion}
+          >
+            Next Question
+          </ActionButtonHighlighted>
+        );
+      } else {
+        return (
+          <ActionButton
+            type="button"
+            onClick={submitChoices}
+          >
+            Submit
+          </ActionButton>
+        );
+      }
+    } else {
+      return (
+        <ActionButtonDisabled disabled>
+          Submit
+        </ActionButtonDisabled>
+      );
+    }
+  }
+
   // Submits an array of selected choices for validation
   function submitChoices() {
-    // no selections have been made, update feedback message
-    if (selectedChoices.length < 1) {
-      setMessage(NO_CHOICE_MADE);
-      return;
-    }
     // start grading
     if (isFeedbackEnabled) {
       // grade the response and allow user to see feedback message
@@ -146,13 +158,22 @@ const QuestionWrapper = styled.div`
   justify-content: center;
   align-items: center;
   height: 100vh;
+  background: #E6E7FF;
 `;
 
 const ChoiceBank = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
   width: 90%;
 `;
 
 const ActionWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;  
   height: 5em;
   width: 100%;
 `;
@@ -163,16 +184,37 @@ const MessageBox = styled.section`
 
 const QuestionTitle = styled.h1`
   font-family: 'Montserrat', sans-serif;
-  color: #FFFFFF;
 `;
 
 const ActionButton = styled(ButtonBase)`
-  width: 100%;
+  width: 90%;
   height: 4em;
-  background: ${props => props.backgroundColor || "#4ACAB0"};
-  border: 2px solid ${props => props.borderColor || "#1ABC9C"};
-  color: ${props => props.primaryColor || "#FFFFFF"};
+  margin-top: 1em;
   font-size: 1em;
   font-weight: 700;
+  background: #FFFFFF;
+  color: #FFB3B3;
+  border: none;
   outline: none;
+
+  &:hover {
+    border: 2px solid #FFE6E6;
+  }
+`;
+
+const ActionButtonDisabled = styled(ActionButton)`
+  color: #FFE6E6;
+
+  &:hover {
+    border: none;
+  }
+`;
+
+const ActionButtonHighlighted = styled(ActionButton)`
+  background: #ffcc99;
+  color: #FFFFFF;
+
+  &:hover {
+    border: none;
+  }
 `;
