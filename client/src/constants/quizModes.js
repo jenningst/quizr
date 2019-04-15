@@ -1,5 +1,5 @@
 const LEARNING_MODE = {
-  RETRIES: true,
+  ATTEMPTS: 3,
   FEEDBACK: true,
   REPORT: "NONE",
   TIMER: "NONE",
@@ -7,7 +7,7 @@ const LEARNING_MODE = {
 };
 
 const PREP_MODE = {
-  RETRIES: false,
+  ATTEMPTS: 1,
   FEEDBACK: true,
   REPORT: "QUESTION",
   TIMER: "QUESTION",
@@ -15,7 +15,7 @@ const PREP_MODE = {
 };
 
 const ADAPTIVE_MODE = {
-  RETRIES: false,
+  ATTEMPTS: 1,
   FEEDBACK: false,
   REPORT: "SET",
   TIMER: "SET",

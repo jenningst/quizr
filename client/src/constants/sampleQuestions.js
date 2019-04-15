@@ -53,15 +53,15 @@ export const SAMPLE_QUESTIONS = [
     "title":"Which of these is a statement?",
     "choices":[
       {
-        "text":"var x = console.log(\'Hello World!\');",
+        "text":"var x = console.log('Hello World!');",
         "isAnswer":true
       },
       {
-        "text":"const x = function(\'str\') { return str + s};",
+        "text":"const x = function(str) { return str + s};",
         "isAnswer":true
       },
       {
-        "text":"const x = \'Hello World!\';",
+        "text":"const x = Hello World!;",
         "isAnswer":true
       },
       {

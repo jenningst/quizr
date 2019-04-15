@@ -1,29 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import Question from './Question';
+import AnswerKey from './AnswerKey';
 import Assessment from './Assessment';
+// import ButtonBase from './common/base/ButtonBase';
 import styled from 'styled-components';
 import { SAMPLE_QUESTIONS } from '../constants/sampleQuestions';
 import { MODES } from '../constants/quizModes';
+import { objectsAreEqual } from '../utilities/helpers'; 
 
 const Quiz = () => {
-  // state for all modes
   const [questions, setQuestions] = useState([]);
   const [index, setIndex] = useState(0);
-  // state for intensive mode
-  const [mode, setMode] = useState(MODES.PREP_MODE);
+  const [mode] = useState(MODES.PREP_MODE);
   const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
-  const [attemptCounter, setAttemptCounter] = useState(3);
+  const [attemptCounter, setAttemptCounter] = useState(mode.ATTEMPTS);
 
+  // Pre-load questions
   useEffect(() => {
-    // pre-load questions
-    setQuestions(SAMPLE_QUESTIONS);
+    function preloadQuestions() {
+      setQuestions(SAMPLE_QUESTIONS);
+    }
+    if (mode.PRELOAD_QUESTIONS) preloadQuestions();
   }, []);
 
   return (
     <QuizWrapper>
       <h1>Question {index + 1} of {questions.length}</h1>
-      {mode.RETRIES && <h1>You have {attemptCounter} attempts left</h1>}
+      <h2>{mode.ATTEMPTS && `Remaining attempts: ${attemptCounter}`}</h2>
+
       {index && index === questions.length
         ? <Assessment
             score={correctCount}
@@ -33,57 +38,56 @@ const Quiz = () => {
             ?  <Question
                   question={SAMPLE_QUESTIONS[index]}
                   gradeResponse={gradeResponse}
-                  retries={mode.RETRIES}
+                  retries={mode.ATTEMPTS}
+                  feedback={mode.FEEDBACK}
                   isCorrect={isSubmissionCorrect}
                   getNextQuestion={getNextQuestion}
                   remainingAttempts={attemptCounter}
               />
-            : <h1>No attemps left!</h1>
+            : <AnswerKey
+                answerKey={SAMPLE_QUESTIONS[index]}
+                getNextQuestion={getNextQuestion}
+              />
       }
+
     </QuizWrapper>
   );
 
+  // function hydrateResponseBeforeGrade(choicePayload) {
+  //   // call gradeResponse() with some other key data
+  //   const MODE = mode;
+  //   let response = gradeResponse(MODE, question, choicePayload);
+  // }
+
+  // function maskAnswerKey(question) {
+  //   // Removes answer from a question object
+  //   let cleansedQuestion = { ...question };
+  //   return cleansedQuestion.choices.forEach(choice => choice.isAnswer = null);
+  // }
+
   // REFACTOR: make this async on the server
+  // Checks the validity of a choices payload from Question
   function gradeResponse(choicePayload) {
-    // Checks the validity of a choices payload from Question
-    const ANSWERS = getAnswers();
+    const ANSWERS = getAnswerArray();
     const IS_CORRECT = objectsAreEqual(ANSWERS, choicePayload);
 
-    if (mode.REPORT === "SET") {
-      if (IS_CORRECT) { 
-        setIsSubmissionCorrect(true); // mark as correct
-        setCorrectCount(correctCount + 1); // update correct count
-        return;
+    if (IS_CORRECT) {
+      if (mode.REPORT !== "NONE") setCorrectCount(correctCount + 1);
+      if (mode.FEEDBACK) { 
+        setIsSubmissionCorrect(true);
+      } else {
+        getNextQuestion();
       }
-    } else if (mode.REPORT === "QUESTION") {
-      if (IS_CORRECT) {
-        setIsSubmissionCorrect(true); // mark as correct
-        setCorrectCount(correctCount + 1); // update correct count
-        return;
-      }
-      setAttemptCounter(attemptCounter - 1); // decrement attempts
-    } else if (mode.REPORT === "NONE") {
-      if (IS_CORRECT) {
-        
-      }
+    } else {
+      if (mode.ATTEMPTS) setAttemptCounter(attemptCounter - 1);
+      if (mode.FEEDBACK) setIsSubmissionCorrect(false);
     }
   }
 
-  function objectsAreEqual(a, b) {
-    // Compares two arrays for equality
-    if (a.length === b.length) {
-      // go through each response
-      if (a.every(item => b.includes(item))) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  function getAnswers() {
+  function getAnswerArray() {
     // Helper method; Returns an array of correct choice indexes
     let answerIndexes = [];
-    SAMPLE_QUESTIONS[index].choices.map((choice, index) => {
+    SAMPLE_QUESTIONS[index].choices.forEach((choice, index) => {
       if (choice.isAnswer === true) {
         answerIndexes.push(index);
       }
@@ -93,17 +97,27 @@ const Quiz = () => {
 
   function getNextQuestion() {
     // Gets the next question object
-
     if (index < questions.length) {
       setIndex(index + 1); // increment the index; re-render
     }
     setIsSubmissionCorrect(false); // reset correct to false and re-render
-    setAttemptCounter(3); // reset attemptCounter to 3
+    setAttemptCounter(mode.ATTEMPTS); // reset attemptCounter
   }
 };
+
+export default Quiz;
 
 const QuizWrapper = styled.div`
   background: #46596C;
 `;
 
-export default Quiz;
+// const ActionButton = styled(ButtonBase)`
+//   width: 100%;
+//   height: 4em;
+//   background: ${props => props.backgroundColor || "#4ACAB0"};
+//   border: 2px solid ${props => props.borderColor || "#1ABC9C"};
+//   color: ${props => props.primaryColor || "#FFFFFF"};
+//   font-size: 1em;
+//   font-weight: 700;
+//   outline: none;
+// `;

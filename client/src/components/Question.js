@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import ButtonBase from './common/base/ButtonBase';
-import AnswerItem from './AnswerItem';
+import QuestionChoice from './QuestionChoice';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
@@ -12,24 +12,32 @@ const Question = ({
   question,
   gradeResponse,
   retries,
+  feedback,
   isCorrect,
   getNextQuestion,
   remainingAttempts,
-}) => {   
+}) => {
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
-  const [cumulativeSelections, setCumulativeSelections] = useState(0);
+  const [shouldDisplayMessage, setShouldDisplayMessage] = useState(0);
   
   useEffect(() => {
+    // Renders an error message if remainingAttempts changes
+    // Clears selection if remainingAttemps changes
     function renderMessage() { setMessage(ERROR_MESSAGE) };
-    if (remainingAttempts < 3) { renderMessage() };
-    // answer was wrong and attempsLeft has updated; reset local choices
+    // if remaining attempts === retries, question is being rendered for the 
+    // first time; if on 1 + Nth attempt, allow rendering of a message to user
+    if (remainingAttempts !== retries && feedback) { 
+      renderMessage();
+    };
     setSelectedChoices([]);
   }, [remainingAttempts]);
 
   useEffect(() => {
+    // Render a success message if isCorrect changes (to true) 
+    // and feedback is enabled
     function renderMessage() {
-      if (isCorrect) { setMessage(SUCCESS_MESSAGE) };
+      if (isCorrect && feedback) { setMessage(SUCCESS_MESSAGE) };
     }
     renderMessage();
   }, [isCorrect]);
@@ -39,9 +47,9 @@ const Question = ({
       <QuestionTitle className="question-title">
         {question.title}
       </QuestionTitle>
-      <AnswerList className="answer-list">
+      <ChoiceBank className="choice-list">
         {question.choices.map((choice, index) => (
-          <AnswerItem
+          <QuestionChoice
             key={index}
             index={index}
             choiceText={choice.text}
@@ -67,25 +75,24 @@ const Question = ({
               </ActionButton>
           }
         </ActionWrapper>
-      </AnswerList>
+      </ChoiceBank>
       <MessageBox className="message-box">
-        {cumulativeSelections === 0 ? message : null}
+        {shouldDisplayMessage === 0 ? message : null}
       </MessageBox>
     </QuestionWrapper>
   );
 
   // Submits an array of selected choices for validation
   function submitChoices() {
-    if (retries) {
-      // if no selections have been made, alert
-      if (selectedChoices.length < 1) {
-        setMessage(NO_CHOICE_MADE);
-        return;
-      }
-      // send all selected choices to parent
+    // if no selections have been made, alert
+    if (selectedChoices.length < 1) {
+      setMessage(NO_CHOICE_MADE);
+      return;
+    }
+    // if feedback disabled; grade response and get next question
+    if (feedback) {
       gradeResponse(selectedChoices);
-      // allow message to be shown
-      setCumulativeSelections(0); 
+      setShouldDisplayMessage(0); 
     } else {
       gradeResponse(selectedChoices);
       fetchNextQuestion();
@@ -105,7 +112,7 @@ const Question = ({
     }
     // update state with element added or removed
     setSelectedChoices(selections);
-    setCumulativeSelections(cumulativeSelections + 1);
+    setShouldDisplayMessage(shouldDisplayMessage + 1);
   }
 
   // Sets a request to Quiz for the next question
@@ -113,7 +120,7 @@ const Question = ({
     // reset our selected choices
     setSelectedChoices([]);
     // reset our cumulative selections
-    setCumulativeSelections(0);
+    setShouldDisplayMessage(0);
     // reset our messages
     setMessage("");
     // ask for the next question
@@ -127,6 +134,8 @@ Question.propTypes = {
     title: PropTypes.string.isRequired,
   }).isRequired,
   gradeResponse: PropTypes.func.isRequired,
+  retries: PropTypes.number.isRequired,
+  feedback: PropTypes.bool.isRequired,
   isCorrect: PropTypes.bool.isRequired,
   getNextQuestion: PropTypes.func.isRequired,
   remainingAttempts: PropTypes.number.isRequired,
@@ -142,7 +151,7 @@ const QuestionWrapper = styled.div`
   height: 100vh;
 `;
 
-const AnswerList = styled.section`
+const ChoiceBank = styled.section`
   width: 90%;
 `;
 
