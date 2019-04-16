@@ -23,9 +23,13 @@ const Quiz = ({ mode }) => {
   }, []);
 
   return (
-    <QuizWrapper>
-      <h1>Question {index + 1} of {questions.length}</h1>
-      <h2>{mode.ATTEMPTS && `Remaining attempts: ${attemptCounter}`}</h2>
+    <QuizWrapper className="quiz-wrapper">
+      {index < questions.length &&
+        <QuestionCounter>
+          QUESTION {index + 1} of {questions.length}
+        </QuestionCounter>
+      }
+      <h2>{mode.ATTEMPTS > 1 && `Remaining attempts: ${attemptCounter}`}</h2>
 
       {index && index === questions.length
         ? <Assessment
@@ -106,6 +110,12 @@ const Quiz = ({ mode }) => {
 export default Quiz;
 
 const QuizWrapper = styled.div`
-  background: #FFFFFF;
-  color: #8B90FF
+  color: #8B90FF;
+`;
+
+const QuestionCounter = styled.h3`
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  width: 100%;
+  text-align: center;
 `;

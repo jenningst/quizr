@@ -13,12 +13,12 @@ const QuestionChoice = ({
   return (
     <>
       {isSelected ? (
-        <LargeButton
+        <HighlightedButton
           primary
           onClick={e => toggleIsSelected(index)}
         >
           {choiceText}
-        </LargeButton>
+        </HighlightedButton>
         ) : (
           <LargeButton
             type="button"
@@ -49,14 +49,24 @@ const LargeButton = styled(ButtonBase)`
   width: 90%;
   height: 4em;
   margin: 0em 1em .25em 1em;
-  background: ${props => props.primary ? "#8B90FF" : "#FFFFFF"};
-  color: ${props => props.primary ? "#F2F2F2" : "#8B90FF"};
   font-size: 1em;
-  font-weight: ${props => props.primary ? "700" : "400"};
-  border: 1px solid #FFFFFF;
+  background: #FFFFFF;
+  color: #8B90FF;
+  border: none;
   outline: none;
 
   &:hover {
-    border: 3px solid #B3B6FF;
+    border: 3px solid #8B90FF;
+    font-weight: 700;
+  }
+`;
+
+const HighlightedButton = styled(LargeButton)`
+  background: #8B90FF;
+  font-weight: 700;
+  color: #FFFFFF;
+
+  &:hover {
+    border: none;
   }
 `;

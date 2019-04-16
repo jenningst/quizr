@@ -4,6 +4,8 @@ import styled from 'styled-components';
 import ButtonBase from './common/base/ButtonBase';
 import QuestionChoice from './QuestionChoice';
 
+const MESSAGE_TEXT = 'Your answer was incorrect. Here were the correct choices.'
+
 const AnswerKey = ({
   answerKey,
   getNextQuestion
@@ -32,6 +34,7 @@ const AnswerKey = ({
         </ActionWrapper>
       </AnswerBank>
       <MessageBox className="message-box">
+        {MESSAGE_TEXT}
       </MessageBox>
     </AnswerKeyWrapper>
   );
@@ -61,7 +64,7 @@ const AnswerBank = styled.section`
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  width: 90%;
+  width: 100%;
 `;
 
 const ActionWrapper = styled.div`
@@ -74,11 +77,17 @@ const ActionWrapper = styled.div`
 `;
 
 const MessageBox = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;  
   height: 5em;
 `;
 
 const QuestionTitle = styled.h1`
   font-family: 'Montserrat', sans-serif;
+  font-size: 3em;
+  width: 90%;
 `;
 
 const ActionButton = styled(ButtonBase)`

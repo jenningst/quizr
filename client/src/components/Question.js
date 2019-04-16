@@ -50,6 +50,7 @@ const Question = ({
       <QuestionTitle className="question-title">
         {questionData.title}
       </QuestionTitle>
+      <Divider/>
       <ChoiceBank className="choice-list">
         {questionData.choices.map((choice, index) => (
           <QuestionChoice
@@ -95,7 +96,7 @@ const Question = ({
     } else {
       return (
         <ActionButtonDisabled disabled>
-          Submit
+          Select a Choice
         </ActionButtonDisabled>
       );
     }
@@ -138,6 +139,7 @@ const Question = ({
 };
 
 Question.propTypes = {
+  questionNumber: PropTypes.number.isRequired,
   questionData: PropTypes.shape({
     choices: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
@@ -155,7 +157,7 @@ export default Question;
 const QuestionWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100vh;
   background: #E6E7FF;
@@ -166,7 +168,7 @@ const ChoiceBank = styled.section`
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
-  width: 90%;
+  width: 100%;
 `;
 
 const ActionWrapper = styled.div`
@@ -178,12 +180,22 @@ const ActionWrapper = styled.div`
   width: 100%;
 `;
 
-const MessageBox = styled.section`
-  height: 5em;
+const QuestionTitle = styled.h1`
+  margin-top: 1em;
+  margin-bottom: 1em;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  width: 90%;
 `;
 
-const QuestionTitle = styled.h1`
-  font-family: 'Montserrat', sans-serif;
+const Divider = styled.hr`
+  background: #8B90FF;
+  height: 1px;
+  margin-bottom: 2em;
+  outline: none;
+  border: none;
+  width: 90%;
 `;
 
 const ActionButton = styled(ButtonBase)`
@@ -211,10 +223,18 @@ const ActionButtonDisabled = styled(ActionButton)`
 `;
 
 const ActionButtonHighlighted = styled(ActionButton)`
-  background: #ffcc99;
+  background: #FFCC99;
   color: #FFFFFF;
 
   &:hover {
     border: none;
   }
+`;
+
+const MessageBox = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;  
+  height: 5em;
 `;
