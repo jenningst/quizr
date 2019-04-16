@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { reducer, addQuestionChoice } from '../reducers/reducer';
+// import { reducer, addQuestionChoice } from '../reducers/reducer';
 import Form from './common/Form';
-import InputField from './common/InputField';
-import Button from './common/Button';
-import ChoiceItem from './ChoiceItem';
+import ButtonBase from './common/base/ButtonBase';
+import ChoiceItemImproved from './ChoiceItemImproved';
+import styled from 'styled-components';
 
 const MINIMUM_CHOICES = "Question must have at least 4 choice options.";
 const MINIMUM_ANSWERS = "Question must have at least 1 answer.";
@@ -14,53 +14,67 @@ const EditQuestion = () => {
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
   const [title, setTitle] = useState("");
   const [errorList, setErrorList] = useState([]);
+  const [choiceText, setChoiceText] = useState("");
+  const [allowSubmit, setAllowSubmit] = useState(false);
+  
+  checkAllowSubmit(choiceCache);
 
   return (
-    <div>
-      <h1>Create a New Question</h1>
-      <Form className="compose-question" onSubmit={handleFormSubmit}>
-        <InputField 
-          type="text"
-          name="question-title"
-          placeholder="Type your question here..."
-          value={title}
-          onChange={handleNameChange}
-        >
-          Problem Statement
-        </InputField>
-        <Button
-          type="button"
-          onClick={addChoiceInput}
-        >
-          Add Answer
-        </Button>
-        <div>
-          <ul>
-          {errorList.map((error, index) => (
-            <li key={index}>{error}</li>
-          ))}
-          </ul>
-        </div>
-        {choiceCache &&
-          choiceCache.map(choice => {
-            const { index, isAnswer } = choice;
-            return (
-              <ChoiceItem
-                key={index}
-                index={index}
-                isAnswer={isAnswer}
-                toggleIsAnswer={toggleIsAnswer}
-                updateChoice={updateChoiceInput}
-                deleteChoice={deleteChoiceInput}
-              />
-            )
-          })
+    <ComposeQuestionWrapper className="compose-question-wrapper">
+      <ComposeQuestionTitle>Compose a New Question</ComposeQuestionTitle>
+      <Form className="compose-question-form">
+        <Title className="form-title">PROBLEM STATEMENT</Title>
+        <InputWrapper>
+          <ProblemStatementInput 
+            size="50"
+            type="text"
+            name="question-title"
+            placeholder="Type your question here..."
+            value={title}
+            onChange={handleNameChange}
+          />
+        </InputWrapper>
+        <Title className="form-title">CHOICE BANK</Title>
+        <EmbeddedSubmitInputWrapper className="embedded-submit-input">
+          <ChoiceInput 
+            type="text"
+            name="choice-text"
+            value={choiceText}
+            onChange={handleNameChange}
+            placeholder="Type a valid choice..."
+          />
+          <EmbeddedButton type="button" onClick={addChoiceInput}>
+            {"CREATE CHOICE"}
+          </EmbeddedButton>
+        </EmbeddedSubmitInputWrapper>
+        <ChoiceBank className="choice-bank">
+          {choiceCache &&
+            choiceCache.map(choice => {
+              const { index, isAnswer, text } = choice;
+              return (
+                <ChoiceItemImproved
+                  key={index}
+                  index={index}
+                  choiceText={text}
+                  isAnswer={isAnswer}
+                  toggleIsAnswer={toggleIsAnswer}
+                  updateChoice={updateChoiceInput}
+                  deleteChoice={deleteChoiceInput}
+                />
+              )
+            })
+          }
+        </ChoiceBank>
+        {allowSubmit
+          ? <ActionButton type="submit" onClick={handleFormSubmit}>
+              Submit
+            </ActionButton>
+          : <ActionButtonDisabled disabled>
+              Create Choices
+            </ActionButtonDisabled>
         }
-        <Button type="submit" onClick={handleFormSubmit}>
-          Submit
-        </Button>
       </Form>
-    </div>
+    </ComposeQuestionWrapper>
   );
 
   function toggleIsAnswer(index) {
@@ -122,14 +136,38 @@ const EditQuestion = () => {
   }
   
   function handleNameChange(e) {
-    setTitle(e.target.value);
-  } 
+    switch(e.target.name) {
+      case "question-title":
+        setTitle(e.target.value);
+        return;
+      case "choice-text":
+        setChoiceText(e.target.value);
+        return;
+      default:
+        return;
+    }
+  }
+
+  function checkAllowSubmit(choiceCache) {
+    console.log('checking if allow submit');
+    let validAnswers = [];
+
+    useEffect(() => {
+      validAnswers = choiceCache.filter(choice => choice.isAnswer === true);
+      if (validAnswers.length > 0) {
+        setAllowSubmit(true);
+      } else {
+        setAllowSubmit(false);
+      }
+    }, [choiceCache])
+  }
   
+  // Creates a new, blank choice template in state
   function addChoiceInput() {
     // setup choice payload
     const newChoice = { 
       index: choiceIncrementer,
-      text: "",
+      text: choiceText,
       isAnswer: false,
     };
     setChoiceCache([...choiceCache, newChoice ]);
@@ -173,3 +211,127 @@ const EditQuestion = () => {
 
 export default EditQuestion;
 
+const ComposeQuestionWrapper = styled.div`
+  color: #8B90FF;
+  height: 100vh;
+  background: #E6E7FF;
+  padding: 1em;
+`;
+
+const ComposeQuestionTitle = styled.h1`
+  margin-top: 1em;
+  margin-bottom: 1em;
+  text-align: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 2em;
+  width: 100%;
+`;
+
+const Title = styled.h3`
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  width: 100%;
+  text-align: center;
+`;
+
+const ChoiceBank = styled.section`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+
+  & > div {
+    margin-top: .25em;
+  }
+`;
+
+const InputWrapper = styled.div`
+  width: 100%;
+  margin-bottom: 1em;
+`;
+
+const ProblemStatementInput = styled.input`
+  box-sizing: border-box;
+  width: 100%;
+  background: #FFFFFF;
+  color: #8B90FF;
+  font-family: Roboto;
+  font-size: 1em;
+  padding: 1em;
+  border: none;
+  border-bottom: 3px solid #8B90FF;
+  outline: none;
+
+  &::placeholder {
+    color: #CCCCCF;
+    font-size: 1em;
+    font-weight: 400;
+    font-family: 'Montserrat', sans-serif;
+  }
+`;
+
+const EmbeddedSubmitInputWrapper = styled.div`
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 5px;
+  background: #FFFFFF;
+`;
+
+const ChoiceInput = styled.input`
+  flex-grow: 2;  
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  padding: 1em;
+  outline: none;
+  border: none;
+  
+  &::placeholder {
+    color: #CCCCCF;
+    font-size: 1em;
+  }
+`;
+
+const ActionButton = styled(ButtonBase)`
+  width: 100%;
+  height: 4em;
+  margin-top: 1em;
+  font-size: 1em;
+  font-weight: 700;
+  background: #FFFFFF;
+  color: #FFB3B3;
+  border: none;
+  outline: none;
+
+  &:hover {
+    border: 2px solid #FFE6E6;
+  }
+`;
+
+const EmbeddedButton = styled(ButtonBase)`
+  text-align: center;
+  vertical-align: center;
+  font-size: .75em;
+  font-weight: 700;
+  padding: 1em;
+  margin-right: .5em;
+  background: #CCCCCF;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+
+  &:hover {
+    background: #8B90FF;
+  }
+`;
+
+const ActionButtonDisabled = styled(ActionButton)`
+  color: #FFE6E6;
+
+  &:hover {
+    border: none;
+  }
+`;

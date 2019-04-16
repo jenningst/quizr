@@ -31,7 +31,7 @@ const Quiz = ({ mode }) => {
       }
       <h2>{mode.ATTEMPTS > 1 && `Remaining attempts: ${attemptCounter}`}</h2>
 
-      {index && index === questions.length
+      {index && questions && index === questions.length
         ? <Assessment
             score={correctCount}
             totalPossible={questions.length}
