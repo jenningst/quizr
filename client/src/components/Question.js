@@ -139,7 +139,6 @@ const Question = ({
 };
 
 Question.propTypes = {
-  questionNumber: PropTypes.number.isRequired,
   questionData: PropTypes.shape({
     choices: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,

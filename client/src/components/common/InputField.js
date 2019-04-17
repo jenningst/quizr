@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from "styled-components";
 
 const InputField = ({ 
+    size,
     type,
     name,
     placeholder,
@@ -15,6 +16,7 @@ const InputField = ({
   <label>
     {children}
     <StyledInput
+      size={size}
       type={type}
       name={name}
       placeholder={placeholder}
@@ -29,6 +31,7 @@ const InputField = ({
 export default InputField;
 
 InputField.propTypes = {
+  size: PropTypes.number,
   type: PropTypes.string.isRequired,
   name: PropTypes.string,
   placeholder: PropTypes.string,
@@ -39,15 +42,13 @@ InputField.propTypes = {
 };
 
 InputField.defaultProps = {
+  size: 20,
   name: "",
   onFocus: null,
   onBlur: null,
 };
 
 const StyledInput = styled.input`
-  background: #FFFFFF;
-  color: #2C3338;
   font-family: Roboto;
   font-size: 1em;
-  padding: .5em;
 `;
