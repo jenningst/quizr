@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-// import { reducer, addQuestionChoice } from '../reducers/reducer';
 import Form from './common/Form';
 import ButtonBase from './common/base/ButtonBase';
-import ChoiceItemImproved from './ChoiceItemImproved';
+import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 
-const MINIMUM_CHOICES = "Question must have at least 4 choice options.";
-const MINIMUM_ANSWERS = "Question must have at least 1 answer.";
-const BLANK_TEMPLATE = "Question template cannot be blank.";
+// const MINIMUM_CHOICES = "Question must have at least 4 choice options.";
+// const MINIMUM_ANSWERS = "Question must have at least 1 answer.";
+// const BLANK_TEMPLATE = "Question template cannot be blank.";
 
 const EditQuestion = () => {
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
   const [title, setTitle] = useState("");
-  const [errorList, setErrorList] = useState([]);
+  // const [errorList, setErrorList] = useState([]);
   const [choiceText, setChoiceText] = useState("");
   const [allowSubmit, setAllowSubmit] = useState(false);
   
@@ -53,7 +52,7 @@ const EditQuestion = () => {
           choiceCache.map(choice => {
             const { index, isAnswer, text } = choice;
             return (
-              <ChoiceItemImproved
+              <ChoiceItem
                 key={index}
                 index={index}
                 choiceText={text}
@@ -77,6 +76,7 @@ const EditQuestion = () => {
     </ComposeQuestionWrapper>
   );
 
+  // Toggles whether a choice is a valid answer
   function toggleIsAnswer(index) {
     let updatedCache = [ ...choiceCache ];
     // find object with the correct index
@@ -88,6 +88,7 @@ const EditQuestion = () => {
     }
   }
   
+  // Handles a question submission
   function handleFormSubmit(e) {
     e.preventDefault();
     const questionPayload = {
@@ -135,11 +136,10 @@ const EditQuestion = () => {
     // } else {
     //   resultingErrors.push(BLANK_TEMPLATE);
     // }
-
-    
     // setErrorList(resultingErrors);
   }
   
+  // Handles changes for input fields
   function handleNameChange(e) {
     switch(e.target.name) {
       case "question-title":
@@ -153,8 +153,8 @@ const EditQuestion = () => {
     }
   }
 
+  // Hook to check whether a question meets the criteria for submission
   function checkAllowSubmit(choiceCache) {
-    console.log('checking if allow submit');
     let validAnswers = [];
 
     useEffect(() => {
@@ -181,6 +181,7 @@ const EditQuestion = () => {
     setChoiceText("");
   }
   
+  // Deletes an existing choice from state
   function deleteChoiceInput(index) {
     let updatedCache = [ ...choiceCache ];
     // find object with the correct index
@@ -200,6 +201,7 @@ const EditQuestion = () => {
     }
   }
 
+  // Updates an existing choice from state
   function updateChoiceInput(choicePayload) {
     if (choicePayload && choicePayload.index > -1) {
       let updatedCache = [ ...choiceCache ];
@@ -263,7 +265,7 @@ const ProblemStatementInput = styled.input`
   width: 100%;
   background: #FFFFFF;
   color: #8B90FF;
-  font-family: Roboto;
+  font-family: 'Montserrat', sans-serif;
   font-size: 1em;
   padding: 1em;
   border: none;
@@ -275,7 +277,6 @@ const ProblemStatementInput = styled.input`
     color: #CCCCCF;
     font-size: 1em;
     font-weight: 400;
-    font-family: 'Montserrat', sans-serif;
   }
 `;
 
@@ -298,6 +299,7 @@ const ChoiceInput = styled.input`
   font-family: 'Montserrat', sans-serif;
   font-size: 1em;
   font-weight: 400;
+  color: #8B90FF;
   padding: 1em;
   outline: none;
   border: none;
