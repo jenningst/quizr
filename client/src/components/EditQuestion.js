@@ -22,20 +22,20 @@ const EditQuestion = () => {
   return (
     <ComposeQuestionWrapper className="compose-question-wrapper">
       <ComposeQuestionTitle>Compose a New Question</ComposeQuestionTitle>
-      <Form className="compose-question-form">
-        <Title className="form-title">PROBLEM STATEMENT</Title>
-        <InputWrapper>
-          <ProblemStatementInput 
-            size="50"
-            type="text"
-            name="question-title"
-            placeholder="Type your question here..."
-            value={title}
-            onChange={handleNameChange}
-          />
-        </InputWrapper>
-        <Title className="form-title">CHOICE BANK</Title>
-        <EmbeddedSubmitInputWrapper className="embedded-submit-input">
+      <Title className="form-title">PROBLEM STATEMENT</Title>
+      <InputWrapper>
+        <ProblemStatementInput 
+          size="50"
+          type="text"
+          name="question-title"
+          placeholder="Type your question here..."
+          value={title}
+          onChange={handleNameChange}
+        />
+      </InputWrapper>
+      <Title className="form-title">CHOICE BANK</Title>
+      <EmbeddedSubmitInputWrapper className="embedded-submit-input">
+        <Form onSubmit={addChoiceInput}>
           <ChoiceInput 
             type="text"
             name="choice-text"
@@ -46,34 +46,34 @@ const EditQuestion = () => {
           <EmbeddedButton type="button" onClick={addChoiceInput}>
             {"CREATE CHOICE"}
           </EmbeddedButton>
-        </EmbeddedSubmitInputWrapper>
-        <ChoiceBank className="choice-bank">
-          {choiceCache &&
-            choiceCache.map(choice => {
-              const { index, isAnswer, text } = choice;
-              return (
-                <ChoiceItemImproved
-                  key={index}
-                  index={index}
-                  choiceText={text}
-                  isAnswer={isAnswer}
-                  toggleIsAnswer={toggleIsAnswer}
-                  updateChoice={updateChoiceInput}
-                  deleteChoice={deleteChoiceInput}
-                />
-              )
-            })
-          }
-        </ChoiceBank>
-        {allowSubmit
-          ? <ActionButton type="submit" onClick={handleFormSubmit}>
-              Submit
-            </ActionButton>
-          : <ActionButtonDisabled disabled>
-              Create Choices
-            </ActionButtonDisabled>
+        </Form>
+      </EmbeddedSubmitInputWrapper>
+      <ChoiceBank className="choice-bank">
+        {choiceCache &&
+          choiceCache.map(choice => {
+            const { index, isAnswer, text } = choice;
+            return (
+              <ChoiceItemImproved
+                key={index}
+                index={index}
+                choiceText={text}
+                isAnswer={isAnswer}
+                toggleIsAnswer={toggleIsAnswer}
+                updateChoice={updateChoiceInput}
+                deleteChoice={deleteChoiceInput}
+              />
+            )
+          })
         }
-      </Form>
+      </ChoiceBank>
+      {allowSubmit
+        ? <ActionButton type="button" onClick={handleFormSubmit}>
+            Submit
+          </ActionButton>
+        : <ActionButtonDisabled disabled>
+            Create Choices
+          </ActionButtonDisabled>
+      }
     </ComposeQuestionWrapper>
   );
 
@@ -90,49 +90,54 @@ const EditQuestion = () => {
   
   function handleFormSubmit(e) {
     e.preventDefault();
+    const questionPayload = {
+      title,
+      choices: [ ...choiceCache ],
+    };
+    console.log(questionPayload);
     
-    let resultingErrors = [];
-    // REFACTOR: Could abstract away error appending logic
-    if (choiceCache) { 
-      if (choiceCache.length < 4) { // invalid number of choices
-        if (!resultingErrors.includes(MINIMUM_CHOICES)) { // add error
-          resultingErrors.push(MINIMUM_CHOICES);
-        }
-      } else { // valid number of choices
-        if (resultingErrors.includes(MINIMUM_CHOICES)) { // clean up error
-          resultingErrors = [
-            resultingErrors.splice(resultingErrors.indexOf(MINIMUM_CHOICES), 1)
-          ];
-        }
-      }
+    // let resultingErrors = [];
+    // // REFACTOR: Could abstract away error appending logic
+    // if (choiceCache) { 
+    //   if (choiceCache.length < 4) { // invalid number of choices
+    //     if (!resultingErrors.includes(MINIMUM_CHOICES)) { // add error
+    //       resultingErrors.push(MINIMUM_CHOICES);
+    //     }
+    //   } else { // valid number of choices
+    //     if (resultingErrors.includes(MINIMUM_CHOICES)) { // clean up error
+    //       resultingErrors = [
+    //         resultingErrors.splice(resultingErrors.indexOf(MINIMUM_CHOICES), 1)
+    //       ];
+    //     }
+    //   }
 
-      if (choiceCache.filter(obj => obj.isAnswer === true).length < 1) { // no answers
-        if(!resultingErrors.includes(MINIMUM_ANSWERS)) {
-          resultingErrors.push(MINIMUM_ANSWERS);
-        }
-      }
-      else { // answer exists
-        if (resultingErrors.includes(MINIMUM_ANSWERS)) { // clean up error
-          resultingErrors = [
-            resultingErrors.splice(resultingErrors.indexOf(MINIMUM_ANSWERS), 1)
-          ];
-        }
-      }
+    //   if (choiceCache.filter(obj => obj.isAnswer === true).length < 1) { // no answers
+    //     if(!resultingErrors.includes(MINIMUM_ANSWERS)) {
+    //       resultingErrors.push(MINIMUM_ANSWERS);
+    //     }
+    //   }
+    //   else { // answer exists
+    //     if (resultingErrors.includes(MINIMUM_ANSWERS)) { // clean up error
+    //       resultingErrors = [
+    //         resultingErrors.splice(resultingErrors.indexOf(MINIMUM_ANSWERS), 1)
+    //       ];
+    //     }
+    //   }
+    //   // finally, create a payload and send it
+    //   if (resultingErrors.length === 0) {
+    //     // TODO: submit payload
+    //     const questionPayload = {
+    //       title,
+    //       choices: [ ...choiceCache ],
+    //     };
+    //     console.log(questionPayload);
+    //   }
+    // } else {
+    //   resultingErrors.push(BLANK_TEMPLATE);
+    // }
+
     
-    if (resultingErrors.length === 0) {
-      // TODO: submit payload
-      const questionPayload = {
-        title,
-        choices: [ ...choiceCache ],
-      };
-      console.log(questionPayload);
-    }
-
-    } else {
-      resultingErrors.push(BLANK_TEMPLATE);
-    }
-
-    setErrorList(resultingErrors);
+    // setErrorList(resultingErrors);
   }
   
   function handleNameChange(e) {
@@ -163,7 +168,8 @@ const EditQuestion = () => {
   }
   
   // Creates a new, blank choice template in state
-  function addChoiceInput() {
+  function addChoiceInput(e) {
+    e.preventDefault();
     // setup choice payload
     const newChoice = { 
       index: choiceIncrementer,
@@ -172,6 +178,7 @@ const EditQuestion = () => {
     };
     setChoiceCache([...choiceCache, newChoice ]);
     setChoiceIncrementer(choiceIncrementer + 1);
+    setChoiceText("");
   }
   
   function deleteChoiceInput(index) {
@@ -261,6 +268,7 @@ const ProblemStatementInput = styled.input`
   padding: 1em;
   border: none;
   border-bottom: 3px solid #8B90FF;
+  border-radius: 5px;
   outline: none;
 
   &::placeholder {
@@ -272,12 +280,17 @@ const ProblemStatementInput = styled.input`
 `;
 
 const EmbeddedSubmitInputWrapper = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: flex-start;
-  align-items: center;
   border-radius: 5px;
   background: #FFFFFF;
+  border-bottom: 3px solid #8B90FF;
+  margin-bottom: 1em;
+
+  & > form {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: flex-start;
+    align-items: center;
+  }  
 `;
 
 const ChoiceInput = styled.input`

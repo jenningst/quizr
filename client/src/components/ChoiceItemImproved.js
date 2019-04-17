@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import ButtonBase from './common/base/ButtonBase';
-import Icon from './common/base/Icon';
+// import Icon from './common/base/Icon';
 import ICONS from '../constants/icons';
 import styled from 'styled-components';
 import shortid from 'shortid';
-import Form from './common/Form';
+// import Form from './common/Form';
 
 // TODO: create some visual artifact to display the input is an answer
 
@@ -20,23 +20,27 @@ const ChoiceItem = ({
   // Local state for handling input changes
   const [inputValue, setInputValue] = useState("");
   
-  // render div: isAnswer | choiceText | delete
-  
   return (
-    <ChoiceGroupWrapper className="choice-group" key={index}>
-      <ButtonBase type="button" onClick={e => toggleIsAnswer(index)}>
-        <SuccessIcon viewBox={ICONS.SUCCESS.viewBox}
-          imageData={ICONS.SUCCESS}
-        >
-          {renderSvgPath(ICONS.SUCCESS.paths)}
-        </SuccessIcon>
-      </ButtonBase>
-      {choiceText}
-      <ButtonBase type="button" onClick={e => deleteChoice(index)}>
-        <DeleteIcon viewBox={ICONS.TRASH.viewBox}>
-          {renderSvgPath(ICONS.TRASH.paths)}
-        </DeleteIcon>
-      </ButtonBase>
+    <ChoiceGroupWrapper 
+      className="choice-group"
+      key={index}
+      highlight={isAnswer}
+    >
+      <EditableContent>
+        {choiceText}
+      </EditableContent>
+      <EmbeddedButton
+        type="button"
+        onClick={e => toggleIsAnswer(index)}
+      >
+        {"IS ANSWER?"}
+      </EmbeddedButton>
+      <EmbeddedButton
+        type="button"
+        onClick={e => deleteChoice(index)}
+      >
+        {"DELETE"}
+      </EmbeddedButton>
     </ChoiceGroupWrapper>
   );
 
@@ -81,24 +85,44 @@ ChoiceItem.propTypes = {
 const ChoiceGroupWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
-  background: #FFFFFF;
+  background: ${props => props.highlight ? "#8B90FF" : "#FFFFFF"};
+  color: ${props => props.highlight ? "#FFFFFF" : "#8B90FF"};
   padding-top: .5em;
   padding-bottom: .5em;
   width: 100%;
   border-radius: 5px;
+
+  & > button {
+    margin-left: .5em;
+    margin-right: .5em;
+  }
 `;
 
-const DeleteIcon = styled.svg`
-  fill: red;
-  color: red;
-  height: 100%
-  width: 1.5em;
+const EditableContent = styled.div`
+  flex-grow: 2;
+  font-family: 'Montserrat', sans-serif;
+  padding-left: 1em;
 `;
 
-const SuccessIcon = styled.svg`
-  fill: black;
-  height: 1.5em;
-  width: 1.5em;
+const EmbeddedButton = styled(ButtonBase)`
+  text-align: center;
+  vertical-align: center;
+  font-size: .75em;
+  font-weight: 700;
+  padding: 1em;
+  margin-right: .5em;
+  background: #CCCCCF;
+  color: #FFFFFF;
+  outline: none;
+  border: none;
+
+  &:hover {
+    background: #8B90FF;
+  }
+`;
+
+const HighlightedButton = styled(EmbeddedButton)`
+  background: #85d9bf;
 `;
