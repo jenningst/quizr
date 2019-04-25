@@ -5,8 +5,8 @@ import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 import { SmallButton } from './common/base/ButtonBase';
 
-
 const ChoiceEntry = ({
+  allowMarkdown,
   title,
   choiceCache,
   toggleIsAnswer,
@@ -14,6 +14,7 @@ const ChoiceEntry = ({
   updateChoice,
   deleteChoice
 }) => {
+  // Local state for handling input changes
   const [choiceText, setChoiceText] = useState("");
 
   return (
@@ -21,14 +22,22 @@ const ChoiceEntry = ({
       <Title>{title}</Title>
       <Form onSubmit={addNewChoice}>
         <InputWrapper>
-          <TextArea
-            rows="3"
-            cols="20"
-            name="choice-text"
-            value={choiceText}
-            onChange={handleInputChange}
-            placeholder="Type a valid choice..."
-          />
+          {allowMarkdown 
+            ? <TextArea
+                rows="3"
+                cols="20"
+                name="choice-text"
+                value={choiceText}
+                onChange={handleInputChange}
+                placeholder="Type a valid choice..."
+              />
+            : <Input 
+                name="choice-text"
+                value={choiceText}
+                onChange={handleInputChange}
+                placeholder="Type a valid choice..."
+              />
+          }
           <EmbeddedButton
             type="submit"
           >
@@ -44,6 +53,7 @@ const ChoiceEntry = ({
               <ChoiceItem
                 key={index}
                 index={index}
+                allowMarkdown={allowMarkdown}
                 choiceText={text}
                 isAnswer={isAnswer}
                 toggleIsAnswer={toggleIsAnswer}
@@ -66,6 +76,7 @@ const ChoiceEntry = ({
   function addNewChoice(e) {
     e.preventDefault();
     addChoice(choiceText);
+    setChoiceText("");
   }
 };
 
@@ -113,6 +124,27 @@ const InputWrapper = styled.div`
 `;
 
 const TextArea = styled.textarea`
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  color: #333333;
+  border: none;
+  border-radius: 2px;
+  box-sizing: border-box;
+  outline: none;
+
+  resize: none;
+  padding: .5em .5em .5em .5em;
+  word-wrap: soft;
+
+  &::placeholder {
+    color: #CCCCCF;
+    font-size: 1em;
+    font-weight: 400;
+  }
+`;
+
+const Input = styled.input`
   width: 100%;
   font-family: 'Montserrat', sans-serif;
   font-size: 1em;

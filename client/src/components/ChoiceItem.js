@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
+import { SmallButton } from './common/base/ButtonBase';
 import styled from 'styled-components';
-import shortid from 'shortid';
 
 const ChoiceItem = ({
   index,
+  allowMarkdown,
   choiceText,
   isAnswer,
   updateChoice,
@@ -25,16 +25,37 @@ const ChoiceItem = ({
       <EditableContentContainer
         className="toggle-editable-container"
       >
-        {isEditable
-          ? <EditableInput
+        {allowMarkdown ? (
+          isEditable ? (
+            <EditableTextArea
+              rows="3"
+              cols="20"
               value={inputValue}
               onChange={handleInputChange}
             />
-          : <DisabledInput
+          ) : ( 
+            <DisabledTextArea
+              rows="3"
+              cols="20"
               value={choiceText}
               onClick={toggleIsEditable}
               readOnly
             />
+          )
+        ) : (
+          isEditable ? (
+            <EditableInput
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          ) : ( 
+            <DisabledInput
+              value={choiceText}
+              onClick={toggleIsEditable}
+              readOnly
+            />
+          )
+        )
         }
       </EditableContentContainer>
       {!isEditable
@@ -93,7 +114,9 @@ export default ChoiceItem;
 
 ChoiceItem.propTypes = {
   index: PropTypes.number.isRequired,
+  allowMarkdown: PropTypes.bool.isRequired,
   choiceText: PropTypes.string.isRequired,
+  isAnswer: PropTypes.bool.isRequired,
   updateChoice: PropTypes.func.isRequired,
   deleteChoice: PropTypes.func.isRequired,
   toggleIsAnswer: PropTypes.func.isRequired,
@@ -117,6 +140,32 @@ const ChoiceGroupWrapper = styled.div`
 const EditableContentContainer = styled.div`
   flex-grow: 2;
   font-family: 'Montserrat', sans-serif;
+`;
+
+const DisabledTextArea = styled.textarea`
+  flex-grow: 2;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  color: #8B90FF;
+  outline: none;
+  border: none;
+  background: none;
+
+  resize: none;
+  padding: .2em .5em .2em .5em;
+
+  &:hover {
+    border-bottom: 1px dotted #8B90FF;
+  }
+`;
+
+const EditableTextArea = styled(DisabledTextArea)`
+  background: none;
+  &:hover {
+    border-bottom: none;
+  }
 `;
 
 const DisabledInput = styled.input`
@@ -155,8 +204,4 @@ const EmbeddedButton = styled(SmallButton)`
   &:hover {
     background: #8B90FF;
   }
-`;
-
-const HighlightedButton = styled(MediumButton)`
-  background: #85d9bf;
 `;

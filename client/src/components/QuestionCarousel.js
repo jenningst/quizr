@@ -8,13 +8,41 @@ import ChoiceEntry from './ChoiceEntry';
 const QuestionCarousel = () => {
   const [problemType, setProblemType] = useState("");
   const [step, setStep] = useState(1);
-  const [maxStepAllowed, setMaxStepAllowed] = useState(4);
+  const [maxStepAllowed, setMaxStepAllowed] = useState(1);
   const [title, setTitle] = useState("");
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
 
   const totalSteps = 3; // TODO: figure out where to put this; DUMMY DATA
-  const PROBLEM_TYPES = ["MULT_ANS", "MULT_ANS_CODE", "LIVE_CODE"];
+  const allowMarkdown = true; // TODO: add config to problem types
+  const PROBLEM_TYPES = ["MULT_ANS_REG", "MULT_ANS_CODE", "LIVE_CODE"];
+
+  // hook for problemType validation
+  useEffect(() => {
+    // if problemType is selected, allow navigation forward
+    if (problemType) setMaxStepAllowed(2);
+  }, [problemType]);
+
+  // hook for title validation
+  useEffect(() => {
+    // if title, allow navigation forward
+    if (title) setMaxStepAllowed(3);
+  }, [title]);
+
+  // hook for choice validation
+  useEffect(() => {
+    // if number of choices is at least 4...
+    if (choiceCache.length >= 4) {
+      // if one of the choices is an answer, allow navigation forward
+      if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
+        setMaxStepAllowed(4);
+      } else {
+        setMaxStepAllowed(3);
+      }
+    } else {
+      setMaxStepAllowed(3);
+    }
+  }, [choiceCache]);
 
   return (
     <ComposeQuestionWrapper className="question-carousel">
@@ -47,7 +75,6 @@ const QuestionCarousel = () => {
   function renderStep() {
     switch (step) {
       case 1:
-        
         return (
           <ProblemType
             problemTypes={PROBLEM_TYPES}
@@ -65,6 +92,7 @@ const QuestionCarousel = () => {
       case 3:
         return (
           <ChoiceEntry
+            allowMarkdown={allowMarkdown}
             title={title}
             choiceCache={choiceCache}
             toggleIsAnswer={toggleIsAnswer}
@@ -89,10 +117,6 @@ const QuestionCarousel = () => {
 
   // Toggles the problem type selected
   function toggleSelect(e) {
-    if (problemType === e.target.name) { // deselect current type
-      setProblemType("");
-      return;
-    }
     setProblemType(e.target.name);
   }
 
@@ -121,7 +145,6 @@ const QuestionCarousel = () => {
       text: payload,
       isAnswer: false,
     };
-    console.log(newChoice);
     setChoiceCache([...choiceCache, newChoice ]);
     setChoiceIncrementer(choiceIncrementer + 1);
   }
@@ -223,19 +246,3 @@ const Counter = styled(Title)`
   font-size: 1em;
   grid-area: header;
 `;
-
-/* 
-STATE:
-- question
-  - problem type (ENUM) multiple answer, mutiple answer (code), live code
-  - problem statement (STR)
-  - choices 
-    - correct choices (BOOL)
-    - incorrect choices (BOOL)
-
-UI:
-- page 1: choose a problem type
-- page 2: define the problem
-- page 3: define the choices (markdown?) and save
-
-*/

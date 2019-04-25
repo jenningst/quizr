@@ -3,13 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { BigButton } from './common/base/ButtonBase';
 
-const ProblemType = ({
-  currentType,
-  problemTypes,
-  toggleSelect,
-  setMaxAllowableStep,
-}) => {
-
+const ProblemType = ({ currentType, problemTypes, toggleSelect, }) => {
   return (
     <>
       <Title>What type of problem is this?</Title>
@@ -37,18 +31,9 @@ ProblemType.propTypes = {
 
 export default ProblemType;
 
-const FloatingSection = styled.section`
-  border: 1px solid blue;
-  padding: 0 1em 0 1em;
-`;
-
 const Title = styled.h1`
   font-size: 2em;
   text-align: center;
-`;
-
-const SubTitle = styled(Title)`
-  font-size: 1em;
 `;
 
 const FlexButtonGroup = styled.div`
