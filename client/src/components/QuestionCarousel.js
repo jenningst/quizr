@@ -9,38 +9,50 @@ const QuestionCarousel = () => {
   const [problemType, setProblemType] = useState("");
   const [step, setStep] = useState(1);
   const [maxStepAllowed, setMaxStepAllowed] = useState(1);
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState("//code");
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
 
   const totalSteps = 3; // TODO: figure out where to put this; DUMMY DATA
   const allowMarkdown = true; // TODO: add config to problem types
-  const PROBLEM_TYPES = ["MULT_ANS_REG", "MULT_ANS_CODE", "LIVE_CODE"];
+  const PROBLEM_TYPES = ["MULT_ANS_SIMPLE", "MULT_ANS_ADV", "LIVE_CODE"];
 
   // hook for problemType validation
   useEffect(() => {
     // if problemType is selected, allow navigation forward
-    if (problemType) setMaxStepAllowed(2);
+    if (problemType) 
+    {
+      setMaxStepAllowed(2);
+    };
   }, [problemType]);
 
   // hook for title validation
   useEffect(() => {
     // if title, allow navigation forward
-    if (title) setMaxStepAllowed(3);
+    if (problemType) {
+      if (title) {
+        setMaxStepAllowed(3);
+      } else {
+        console.log('setting back to 2')
+        setMaxStepAllowed(2);
+      }
+    }
   }, [title]);
 
   // hook for choice validation
   useEffect(() => {
     // if number of choices is at least 4...
-    if (choiceCache.length >= 4) {
-      // if one of the choices is an answer, allow navigation forward
-      if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
-        setMaxStepAllowed(4);
+    if (problemType && title) {
+      if (choiceCache.length >= 4) {
+        // if one of the choices is an answer, allow navigation forward
+        if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
+          setMaxStepAllowed(4);
+        } else {
+          setMaxStepAllowed(3);
+        }
       } else {
         setMaxStepAllowed(3);
       }
-    } else {
-      setMaxStepAllowed(3);
     }
   }, [choiceCache]);
 
@@ -218,13 +230,11 @@ const FlexButtonGroup = styled.div`
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  border: 1px solid red;
 `;
 
 const CenteredButtonGroup = styled(FlexButtonGroup)`
   grid-area: footer;
   flex-wrap: nowrap;
-  border: 1px solid black;
   margin-top: 1em;
   margin-bottom: 1em;
 

@@ -41,7 +41,6 @@ const FlexButtonGroup = styled.div`
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
-  border: 1px solid red;
 `;
 
 const ProblemTypeCard = styled(BigButton)`

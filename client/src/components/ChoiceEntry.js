@@ -4,9 +4,9 @@ import Form from './common/Form';
 import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 import { SmallButton } from './common/base/ButtonBase';
+import Markdown from 'markdown-to-jsx';
 
 const ChoiceEntry = ({
-  allowMarkdown,
   title,
   choiceCache,
   toggleIsAnswer,
@@ -14,12 +14,27 @@ const ChoiceEntry = ({
   updateChoice,
   deleteChoice
 }) => {
-  // Local state for handling input changes
+  // Local state for handling input changes and markdown toggle
   const [choiceText, setChoiceText] = useState("");
+  const [allowMarkdown, setAllowMarkdown] = useState(false);
 
   return (
     <>
-      <Title>{title}</Title>
+      <Title>
+        <Markdown options={{ forceBlock: true}}>
+          {title}
+        </Markdown>
+      </Title>
+      <FlexButtonGroup>
+        <SmallButton
+          onClick={toggleMarkdown}
+        >
+          {allowMarkdown
+            ? "Markdown Enabled"
+            : "Markdown Disabled"
+          }
+        </SmallButton>
+      </FlexButtonGroup>
       <Form onSubmit={addNewChoice}>
         <InputWrapper>
           {allowMarkdown 
@@ -72,6 +87,11 @@ const ChoiceEntry = ({
     setChoiceText(e.target.value);
   }
 
+  // Handles toggle for button
+  function toggleMarkdown() {
+    setAllowMarkdown(!allowMarkdown);
+  }
+
   // Adds a new choice
   function addNewChoice(e) {
     e.preventDefault();
@@ -120,7 +140,6 @@ const InputWrapper = styled.div`
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  border: 1px solid red;
 `;
 
 const TextArea = styled.textarea`
@@ -176,4 +195,12 @@ const EmbeddedButton = styled(SmallButton)`
   &:hover {
     background: #8B90FF;
   }
+`;
+
+const FlexButtonGroup = styled.div`
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1em;
 `;

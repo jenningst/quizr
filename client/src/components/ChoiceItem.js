@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { SmallButton } from './common/base/ButtonBase';
 import styled from 'styled-components';
+import Markdown from 'markdown-to-jsx';
 
 const ChoiceItem = ({
   index,
