@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import ButtonBase from './common/base/ButtonBase';
+import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
 import QuestionChoice from './QuestionChoice';
 
 const MESSAGE_TEXT = 'Your answer was incorrect. Here were the correct choices.'
@@ -90,7 +90,7 @@ const QuestionTitle = styled.h1`
   width: 90%;
 `;
 
-const ActionButton = styled(ButtonBase)`
+const ActionButton = styled(BigButton)`
   width: 90%;
   height: 4em;
   margin-top: 1em;

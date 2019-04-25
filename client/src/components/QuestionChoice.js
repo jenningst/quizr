@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import ButtonBase from './common/base/ButtonBase';
+import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
 
 const QuestionChoice = ({
   index,
@@ -45,16 +45,7 @@ QuestionChoice.defaultProps = {
 
 export default QuestionChoice;
 
-const LargeButton = styled(ButtonBase)`
-  width: 90%;
-  height: 4em;
-  margin: 0em 1em .25em 1em;
-  font-size: 1em;
-  background: #FFFFFF;
-  color: #8B90FF;
-  border: none;
-  outline: none;
-
+const LargeButton = styled(BigButton)`
   &:hover {
     border: 3px solid #8B90FF;
     font-weight: 700;

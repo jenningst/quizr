@@ -1,12 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import ButtonBase from './common/base/ButtonBase';
-import ICONS from '../constants/icons';
+import { SmallButton } from './common/base/ButtonBase';
 import styled from 'styled-components';
-import shortid from 'shortid';
 
 const ChoiceItem = ({
   index,
+  allowMarkdown,
   choiceText,
   isAnswer,
   updateChoice,
@@ -26,16 +25,37 @@ const ChoiceItem = ({
       <EditableContentContainer
         className="toggle-editable-container"
       >
-        {isEditable
-          ? <EditableInput
+        {allowMarkdown ? (
+          isEditable ? (
+            <EditableTextArea
+              rows="3"
+              cols="20"
               value={inputValue}
               onChange={handleInputChange}
             />
-          : <DisabledInput
+          ) : ( 
+            <DisabledTextArea
+              rows="3"
+              cols="20"
               value={choiceText}
               onClick={toggleIsEditable}
               readOnly
             />
+          )
+        ) : (
+          isEditable ? (
+            <EditableInput
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+          ) : ( 
+            <DisabledInput
+              value={choiceText}
+              onClick={toggleIsEditable}
+              readOnly
+            />
+          )
+        )
         }
       </EditableContentContainer>
       {!isEditable
@@ -45,13 +65,13 @@ const ChoiceItem = ({
                 type="button"
                 onClick={e => toggleIsAnswer(index)}
               >
-                {"IS ANSWER?"}
+                {"Is Answer"}
               </EmbeddedButton>
               <EmbeddedButton
                 type="button"
                 onClick={e => deleteChoice(index)}
               >
-                {"DELETE"}
+                {"Delete"}
               </EmbeddedButton>
             </>
           ) : (
@@ -60,7 +80,7 @@ const ChoiceItem = ({
                 type="button"
                 onClick={onSave}
               >
-                {"SAVE"}
+                {"Save"}
               </EmbeddedButton>
             </>
           )
@@ -94,7 +114,9 @@ export default ChoiceItem;
 
 ChoiceItem.propTypes = {
   index: PropTypes.number.isRequired,
+  allowMarkdown: PropTypes.bool.isRequired,
   choiceText: PropTypes.string.isRequired,
+  isAnswer: PropTypes.bool.isRequired,
   updateChoice: PropTypes.func.isRequired,
   deleteChoice: PropTypes.func.isRequired,
   toggleIsAnswer: PropTypes.func.isRequired,
@@ -107,15 +129,8 @@ const ChoiceGroupWrapper = styled.div`
   align-items: center;
   background: ${props => props.highlight ? "#8B90FF" : "#FFFFFF"};
   color: ${props => props.highlight ? "#FFFFFF" : "#8B90FF"};
-  padding-top: .5em;
-  padding-bottom: .5em;
   width: 100%;
-  border-radius: 5px;
-
-  & > button {
-    margin-left: .5em;
-    margin-right: .5em;
-  }
+  border-radius: 2px;
 
   & input {
     color: ${props => props.highlight ? "#FFFFFF" : "#8B90FF"};
@@ -125,13 +140,11 @@ const ChoiceGroupWrapper = styled.div`
 const EditableContentContainer = styled.div`
   flex-grow: 2;
   font-family: 'Montserrat', sans-serif;
-  margin-left: 1em;
-  margin-right: .5em;
 `;
 
-const DisabledInput = styled.input`
+const DisabledTextArea = styled.textarea`
   flex-grow: 2;
-  width: 100%
+  width: 100%;
   font-family: 'Montserrat', sans-serif;
   font-size: 1em;
   font-weight: 400;
@@ -139,6 +152,34 @@ const DisabledInput = styled.input`
   outline: none;
   border: none;
   background: none;
+
+  resize: none;
+  padding: .2em .5em .2em .5em;
+
+  &:hover {
+    border-bottom: 1px dotted #8B90FF;
+  }
+`;
+
+const EditableTextArea = styled(DisabledTextArea)`
+  background: none;
+  &:hover {
+    border-bottom: none;
+  }
+`;
+
+const DisabledInput = styled.input`
+  flex-grow: 2;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1em;
+  font-weight: 400;
+  color: #8B90FF;
+  outline: none;
+  border: none;
+  background: none;
+
+  padding: .2em .5em .2em .5em;
 
   &:hover {
     border-bottom: 1px dotted #8B90FF;
@@ -152,12 +193,8 @@ const EditableInput = styled(DisabledInput)`
   }
 `;
 
-const EmbeddedButton = styled(ButtonBase)`
-  text-align: center;
-  vertical-align: center;
-  font-size: .75em;
-  font-weight: 700;
-  padding: 1em;
+const EmbeddedButton = styled(SmallButton)`
+  font-size: .8em;
   margin-right: .5em;
   background: #CCCCCF;
   color: #FFFFFF;
@@ -167,8 +204,4 @@ const EmbeddedButton = styled(ButtonBase)`
   &:hover {
     background: #8B90FF;
   }
-`;
-
-const HighlightedButton = styled(EmbeddedButton)`
-  background: #85d9bf;
 `;

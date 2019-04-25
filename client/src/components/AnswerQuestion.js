@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import ButtonBase from './common/base/ButtonBase';
+import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
 import QuestionChoice from './QuestionChoice';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
 const NO_CHOICE_MADE = "You need to select at least 1 choice."
 
-const Question = ({ 
+const AnswerQuestion = ({ 
   questionData,
   totalAttemptsAllowed,
   remainingAttempts,
@@ -138,7 +138,7 @@ const Question = ({
   }
 };
 
-Question.propTypes = {
+AnswerQuestion.propTypes = {
   questionData: PropTypes.shape({
     choices: PropTypes.array.isRequired,
     title: PropTypes.string.isRequired,
@@ -151,7 +151,7 @@ Question.propTypes = {
   remainingAttempts: PropTypes.number.isRequired,
 };
 
-export default Question;
+export default AnswerQuestion;
 
 const QuestionWrapper = styled.div`
   display: flex;
@@ -197,7 +197,7 @@ const Divider = styled.hr`
   width: 90%;
 `;
 
-const ActionButton = styled(ButtonBase)`
+const ActionButton = styled(BigButton)`
   width: 90%;
   height: 4em;
   margin-top: 1em;
