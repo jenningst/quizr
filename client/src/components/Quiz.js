@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Question from './Question';
+import Question from './AnswerQuestion';
 import AnswerKey from './AnswerKey';
 import Assessment from './Assessment';
 import styled from 'styled-components';
