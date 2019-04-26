@@ -3,40 +3,55 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { BigButton } from './common/base/ButtonBase';
 
-const ProblemType = ({ currentType, problemTypes, toggleSelect, }) => {
+const ProblemType = ({ modes, problemType, toggleSelect, }) => {
   return (
     <>
-      <Title>What type of problem is this?</Title>
+      <Title className="page-title">What type of problem is this?</Title>
       <FlexButtonGroup className="button-group">
-        {problemTypes.map((type, index) => (
+        {modes.map((mode, index) => (
           <ProblemTypeCard
             key={index}
-            name={type}
-            onClick={toggleSelect}
-            active={currentType === type}
+            index={index}
+            name={mode.DISPLAY_NAME}
+            onClick={() => setAsProblem(index)}
+            active={problemType === mode.DISPLAY_NAME}
           >
-            {type}
+            {mode.DISPLAY_NAME}
           </ProblemTypeCard>
         ))}
       </FlexButtonGroup>
     </>
   );
+
+  // Sets the selected problem type as the selection
+  function setAsProblem(index) {
+    toggleSelect(index);
+  }
 };
 
 ProblemType.propTypes = {
-  currentType: PropTypes.string.isRequired,
-  problemTypes: PropTypes.arrayOf(PropTypes.string),
+  modes: PropTypes.arrayOf(PropTypes.shape({
+    DISPLAY_NAME: PropTypes.string.isRequired,
+    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
+    CODE_EDITOR: PropTypes.bool.isRequired,
+  })).isRequired,
+  problemType: PropTypes.shape({
+    DISPLAY_NAME: PropTypes.string.isRequired,
+    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
+    CODE_EDITOR: PropTypes.bool.isRequired,
+  }),
   toggleSelect: PropTypes.func.isRequired,
 };
 
 export default ProblemType;
 
 const Title = styled.h1`
-  font-size: 2em;
+  font-size: 1.5em;
   text-align: center;
 `;
 
 const FlexButtonGroup = styled.div`
+  flex-grow: 2;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;

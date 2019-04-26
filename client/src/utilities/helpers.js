@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import shortid from 'shortid';
 
 // Helper method, Compares two arrays for equality

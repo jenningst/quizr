@@ -4,10 +4,13 @@ import Form from './common/Form';
 import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 import { SmallButton } from './common/base/ButtonBase';
-import Markdown from 'markdown-to-jsx';
+import CodeEditor from './CodeEditor';
+import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/dracula.css';
 
 const ChoiceEntry = ({
   title,
+  code,
   choiceCache,
   toggleIsAnswer,
   addChoice, 
@@ -20,65 +23,68 @@ const ChoiceEntry = ({
 
   return (
     <>
-      <Title>
-        <Markdown options={{ forceBlock: true}}>
-          {title}
-        </Markdown>
-      </Title>
+      <Title>{title}</Title>
+      <CodeEditor
+        code={code}
+        setCode={() => { return; }}
+        options={{ readOnly: true }}
+      />
       <FlexButtonGroup>
         <SmallButton
           onClick={toggleMarkdown}
         >
           {allowMarkdown
-            ? "Markdown Enabled"
-            : "Markdown Disabled"
+            ? "Markdown in Answers Enabled"
+            : "Markdown in Answers Disabled"
           }
         </SmallButton>
       </FlexButtonGroup>
-      <Form onSubmit={addNewChoice}>
-        <InputWrapper>
-          {allowMarkdown 
-            ? <TextArea
-                rows="3"
-                cols="20"
-                name="choice-text"
-                value={choiceText}
-                onChange={handleInputChange}
-                placeholder="Type a valid choice..."
-              />
-            : <Input 
-                name="choice-text"
-                value={choiceText}
-                onChange={handleInputChange}
-                placeholder="Type a valid choice..."
-              />
+        <ChoiceEntryDiv>
+        <Form onSubmit={addNewChoice}>
+          <InputWrapper>
+            {allowMarkdown 
+              ? <TextArea
+                  rows="3"
+                  cols="20"
+                  name="choice-text"
+                  value={choiceText}
+                  onChange={handleInputChange}
+                  placeholder="Type a valid choice..."
+                />
+              : <Input 
+                  name="choice-text"
+                  value={choiceText}
+                  onChange={handleInputChange}
+                  placeholder="Type a valid choice..."
+                />
+            }
+            <EmbeddedButton
+              type="submit"
+            >
+              Add
+            </EmbeddedButton>
+          </InputWrapper>
+        </Form>
+        <ChoiceBank className="choice-bank">
+          {choiceCache &&
+            choiceCache.map(choice => {
+              const { index, isAnswer, text } = choice;
+              return (
+                <ChoiceItem
+                  key={index}
+                  index={index}
+                  allowMarkdown={allowMarkdown}
+                  choiceText={text}
+                  isAnswer={isAnswer}
+                  toggleIsAnswer={toggleIsAnswer}
+                  updateChoice={updateChoice}
+                  deleteChoice={deleteChoice}
+                />
+              )
+            })
           }
-          <EmbeddedButton
-            type="submit"
-          >
-            Add
-          </EmbeddedButton>
-        </InputWrapper>
-      </Form>
-      <ChoiceBank className="choice-bank">
-        {choiceCache &&
-          choiceCache.map(choice => {
-            const { index, isAnswer, text } = choice;
-            return (
-              <ChoiceItem
-                key={index}
-                index={index}
-                allowMarkdown={allowMarkdown}
-                choiceText={text}
-                isAnswer={isAnswer}
-                toggleIsAnswer={toggleIsAnswer}
-                updateChoice={updateChoice}
-                deleteChoice={deleteChoice}
-              />
-            )
-          })
-        }
-      </ChoiceBank>
+        </ChoiceBank>
+      </ChoiceEntryDiv>
     </>
   );
 
@@ -116,8 +122,12 @@ ChoiceEntry.propTypes = {
 export default ChoiceEntry;
 
 const Title = styled.h1`
-  font-size: 2em;
+  font-size: 1.5em;
   text-align: center;
+`;
+
+const ChoiceEntryDiv = styled.div`
+  width: 100%;
 `;
 
 const ChoiceBank = styled.section`

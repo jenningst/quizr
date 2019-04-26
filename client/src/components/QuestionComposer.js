@@ -1,21 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { BigButton } from './common/base/ButtonBase';
 import ProblemType from './ProblemType';
 import ProblemStatement from './ProblemStatement';
 import ChoiceEntry from './ChoiceEntry';
 
-const QuestionCarousel = () => {
-  const [problemType, setProblemType] = useState("");
+const QuestionComposer = ({ modes }) => {
+  const [problemType, setProblemType] = useState(null);
   const [step, setStep] = useState(1);
   const [maxStepAllowed, setMaxStepAllowed] = useState(1);
-  const [title, setTitle] = useState("//code");
+  const [title, setTitle] = useState("");
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
+  const [code, setCode] = useState("// Start typing to add code...");
 
   const totalSteps = 3; // TODO: figure out where to put this; DUMMY DATA
-  const allowMarkdown = true; // TODO: add config to problem types
-  const PROBLEM_TYPES = ["MULT_ANS_SIMPLE", "MULT_ANS_ADV", "LIVE_CODE"];
+  // console.log(modes);
 
   // hook for problemType validation
   useEffect(() => {
@@ -33,7 +34,6 @@ const QuestionCarousel = () => {
       if (title) {
         setMaxStepAllowed(3);
       } else {
-        console.log('setting back to 2')
         setMaxStepAllowed(2);
       }
     }
@@ -57,8 +57,8 @@ const QuestionCarousel = () => {
   }, [choiceCache]);
 
   return (
-    <ComposeQuestionWrapper className="question-carousel">
-      <Counter>STEP {step}</Counter>
+    <ComposeQuestionWrapper className="composer-carousel">
+      <Counter className="composer-counter">STEP {step}</Counter>
 
         <FloatingSection>
           {renderStep()}
@@ -89,23 +89,26 @@ const QuestionCarousel = () => {
       case 1:
         return (
           <ProblemType
-            problemTypes={PROBLEM_TYPES}
-            currentType={problemType}
+            modes={modes}
+            problemType={problemType}
             toggleSelect={toggleSelect}
           />
         );
       case 2:
         return (
           <ProblemStatement
+            problemType={problemType}
             title={title}  
             updateTitle={updateTitle}
+            code={code}
+            updateCode={updateCode}
           />
         );
       case 3:
         return (
           <ChoiceEntry
-            allowMarkdown={allowMarkdown}
             title={title}
+            code={code}
             choiceCache={choiceCache}
             toggleIsAnswer={toggleIsAnswer}
             addChoice={addChoice}
@@ -128,8 +131,8 @@ const QuestionCarousel = () => {
   }
 
   // Toggles the problem type selected
-  function toggleSelect(e) {
-    setProblemType(e.target.name);
+  function toggleSelect(index) {
+    setProblemType(modes[index]);
   }
 
   // Sets the problem title
@@ -147,6 +150,11 @@ const QuestionCarousel = () => {
       updatedCache[result].isAnswer = !updatedCache[result].isAnswer;
       setChoiceCache(updatedCache);
     }
+  }
+
+  // Handles code editor changes
+  function updateCode(newCode) {
+    setCode(newCode);
   }
 
   // Creates a new, blank choice template in state
@@ -204,11 +212,19 @@ const QuestionCarousel = () => {
   }
 };
 
-export default QuestionCarousel;
+QuestionComposer.propTypes = {
+  modes: PropTypes.arrayOf(PropTypes.shape({
+    DISPLAY_NAME: PropTypes.string.isRequired,
+    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
+    CODE_EDITOR: PropTypes.bool.isRequired,
+  })).isRequired,
+}
+
+export default QuestionComposer;
 
 const ComposeQuestionWrapper = styled.div`
   display: grid;
-  grid-template-rows: 5em 1fr 5em;
+  grid-template-rows: 2em 1fr 5em;
   grid-template-areas:
     "header"
     "main"
@@ -221,8 +237,11 @@ const ComposeQuestionWrapper = styled.div`
 
 const FloatingSection = styled.section`
   grid-area: main;
-  padding-left: 1em;
-  padding-right: 1em;
+
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
 `;
 
 const FlexButtonGroup = styled.div`
@@ -248,7 +267,7 @@ const CenteredButtonGroup = styled(FlexButtonGroup)`
 `;
 
 const Title = styled.h1`
-  font-size: 2em;
+  font-size: 1.5em;
   text-align: center;
 `;
 

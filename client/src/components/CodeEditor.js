@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
 import { Controlled as CodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 import 'codemirror/addon/edit/matchbrackets';
 import 'codemirror/addon/edit/closebrackets';
+import styled from 'styled-components';
 
-const CodeEditor = () => {
-  const [js, setJs] = useState("");
+const CodeEditor = ({ code, setCode }) => {
   const codeMirrorOptions = {
     theme: 'dracula',
     lineNumbers: true,
@@ -17,22 +18,27 @@ const CodeEditor = () => {
   };
 
   return (
-    <div className="code-editor js-code">
-      <div className="editor-header">JavaScript</div>
+    <EditorWrapper className="code-editor js-code">
       <CodeMirror
-        value={js}
+        value={code}
         options={{
           mode: 'javascript',
           ...codeMirrorOptions,
         }}
-        onBeforeChange={(editor, data, js) => {
-          // console.log(editor);
-          // console.log(data);
-          setJs(js);
+        onBeforeChange={(editor, data, code) => {
+          setCode(code);
         }}
       />
-    </div>
+    </EditorWrapper>
   );
 }
 
+CodeEditor.prototype = {
+  code: PropTypes.string.isRequired,
+};
+
 export default CodeEditor;
+
+const EditorWrapper = styled.div`
+  width: 100%;
+`;
