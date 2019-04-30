@@ -4,11 +4,13 @@ import Form from './common/Form';
 import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 import { SmallButton } from './common/base/ButtonBase';
+import { MediumInput } from './common/base/InputBase';
 import CodeEditor from './CodeEditor';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 
 const ChoiceEntry = ({
+  problemType,
   title,
   code,
   choiceCache,
@@ -22,13 +24,16 @@ const ChoiceEntry = ({
   const [allowMarkdown, setAllowMarkdown] = useState(false);
 
   return (
-    <>
+    <PageWrapper>
       <Title>{title}</Title>
-      <CodeEditor
-        code={code}
-        setCode={() => { return; }}
-        options={{ readOnly: true }}
-      />
+
+      {problemType.DISPLAY_NAME === "Advanced Multiple Answer" &&
+        <CodeEditor
+          code={code}
+          setCode={() => { return; }}
+          options={{ readOnly: true }}
+        />
+      }
       <FlexButtonGroup>
         <SmallButton
           onClick={toggleMarkdown}
@@ -39,33 +44,36 @@ const ChoiceEntry = ({
           }
         </SmallButton>
       </FlexButtonGroup>
-        <ChoiceEntryDiv>
-        <Form onSubmit={addNewChoice}>
-          <InputWrapper>
-            {allowMarkdown 
-              ? <TextArea
-                  rows="3"
-                  cols="20"
-                  name="choice-text"
-                  value={choiceText}
-                  onChange={handleInputChange}
-                  placeholder="Type a valid choice..."
-                />
-              : <Input 
-                  name="choice-text"
-                  value={choiceText}
-                  onChange={handleInputChange}
-                  placeholder="Type a valid choice..."
-                />
-            }
-            <EmbeddedButton
-              type="submit"
-            >
-              Add
-            </EmbeddedButton>
-          </InputWrapper>
-        </Form>
-        <ChoiceBank className="choice-bank">
+
+      <ChoiceComposerWrapper className="choice-composer">
+        <ChoiceInput className="choice-input-form">
+          <Form onSubmit={addNewChoice}>
+            <InputWrapper className="form-input-wrapper">
+              {allowMarkdown 
+                ? <TextArea
+                    rows="3"
+                    cols="20"
+                    name="choice-text"
+                    value={choiceText}
+                    onChange={handleInputChange}
+                    placeholder="Start typing a choice ..."
+                  />
+                : <Input 
+                    name="choice-text"
+                    value={choiceText}
+                    onChange={handleInputChange}
+                    placeholder="Start typing a choice ..."
+                  />
+              }
+              <EmbeddedButton
+                type="submit"
+              >
+                Add
+              </EmbeddedButton>
+            </InputWrapper>
+          </Form>
+        </ChoiceInput>
+        <ChoiceList className="choice-list">
           {choiceCache &&
             choiceCache.map(choice => {
               const { index, isAnswer, text } = choice;
@@ -83,9 +91,9 @@ const ChoiceEntry = ({
               )
             })
           }
-        </ChoiceBank>
-      </ChoiceEntryDiv>
-    </>
+        </ChoiceList>
+      </ChoiceComposerWrapper>
+    </PageWrapper>
   );
 
   // Handles changes for input fields
@@ -93,7 +101,7 @@ const ChoiceEntry = ({
     setChoiceText(e.target.value);
   }
 
-  // Handles toggle for button
+  // Handles toggle for allowing markdown
   function toggleMarkdown() {
     setAllowMarkdown(!allowMarkdown);
   }
@@ -107,6 +115,11 @@ const ChoiceEntry = ({
 };
 
 ChoiceEntry.propTypes = {
+  problemType: PropTypes.shape({
+    DISPLAY_NAME: PropTypes.string.isRequired,
+    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
+    CODE_EDITOR: PropTypes.bool.isRequired,
+  }),
   title: PropTypes.string.isRequired,
   choiceCache: PropTypes.arrayOf(PropTypes.shape({
     index: PropTypes.number.isRequired,
@@ -121,27 +134,51 @@ ChoiceEntry.propTypes = {
 
 export default ChoiceEntry;
 
+const PageWrapper = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  height: auto;
+`;
+
 const Title = styled.h1`
   font-size: 1.5em;
   text-align: center;
 `;
 
-const ChoiceEntryDiv = styled.div`
-  width: 100%;
-`;
-
-const ChoiceBank = styled.section`
+const ChoiceComposerWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
+
+  padding-left: 1em;
+  padding-right: 1em;
   width: 100%;
+  max-width: 950px;
 
-  border: 1px solid blue;
-
-  & > div {
-    margin-top: .25em;
+  & form {
+    margin-bottom: 1em;
+    flex-grow: 2;
   }
+`;
+
+const ChoiceInput = styled.div`
+  width: 100%;
+`;
+
+const ChoiceList = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  max-height: 50vh;
+  overflow: scroll;
 `;
 
 const InputWrapper = styled.div`
@@ -149,53 +186,50 @@ const InputWrapper = styled.div`
   flex-flow: row nowrap;
   justify-content: flex-start;
   align-items: center;
+
   width: 100%;
-`;
+  background: #ffffff;
+  padding-top: .50em;
+  padding-bottom: .50em;
 
-const TextArea = styled.textarea`
-  width: 100%;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 1em;
-  color: #333333;
-  border: none;
-  border-radius: 2px;
-  box-sizing: border-box;
-  outline: none;
+  & :first-child {
+    margin-left: 1em;
+    margin-right: 1em;
+  }
 
-  resize: none;
-  padding: .5em .5em .5em .5em;
-  word-wrap: soft;
-
-  &::placeholder {
-    color: #CCCCCF;
-    font-size: 1em;
-    font-weight: 400;
+  & :last-child {
+    margin-right: 1em;
   }
 `;
 
-const Input = styled.input`
-  width: 100%;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 1em;
-  color: #333333;
-  border: none;
-  border-radius: 2px;
-  box-sizing: border-box;
-  outline: none;
+const TextArea = styled.textarea`
+  flex-grow: 2;
 
+  width: 100%;
+  font-size: .70em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 400;
+  padding: .50em
+  border: none;
   resize: none;
-  padding: .5em .5em .5em .5em;
-  word-wrap: soft;
 
   &::placeholder {
-    color: #CCCCCF;
-    font-size: 1em;
-    font-weight: 400;
+    color: #c0c0c0;
+  }
+`;
+
+const Input = styled(MediumInput)`
+  width: 100%;
+  border: none;
+  outline: none;
+
+  &::placeholder {
+    color: #c0c0c0;
   }
 `;
 
 const EmbeddedButton = styled(SmallButton)`
-  font-size: .8em;
+  font-size: .70em;
   margin-right: .5em;
   background: #CCCCCF;
   color: #FFFFFF;
@@ -212,5 +246,6 @@ const FlexButtonGroup = styled.div`
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
+
   margin-bottom: 1em;
 `;

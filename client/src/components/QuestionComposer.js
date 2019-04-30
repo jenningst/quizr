@@ -58,13 +58,15 @@ const QuestionComposer = ({ modes }) => {
 
   return (
     <ComposeQuestionWrapper className="composer-carousel">
-      <Counter className="composer-counter">STEP {step}</Counter>
+      <Header>
+        <Counter className="composer-counter">STEP {step}</Counter>
+      </Header>
 
-        <FloatingSection>
+        <MainSection>
           {renderStep()}
-        </FloatingSection>
+        </MainSection>
 
-      <CenteredButtonGroup className="change-step">
+      <NavigationFooter className="composer-navigation">
         <BigButton
           name="previous"
           disabled={step === 1 ? 'disabled' : null}
@@ -79,7 +81,7 @@ const QuestionComposer = ({ modes }) => {
         >
           {step === totalSteps ? 'Submit' : 'Next'}
         </BigButton> 
-      </CenteredButtonGroup>
+      </NavigationFooter>
 
     </ComposeQuestionWrapper>
   );
@@ -107,6 +109,7 @@ const QuestionComposer = ({ modes }) => {
       case 3:
         return (
           <ChoiceEntry
+            problemType={problemType}
             title={title}
             code={code}
             choiceCache={choiceCache}
@@ -233,9 +236,24 @@ const ComposeQuestionWrapper = styled.div`
   height: 100vh;
   font-family: 'Montserrat', sans-serif;
   color: #333333;
+  background: #f5f6fa;
 `;
 
-const FloatingSection = styled.section`
+const Header = styled.header`
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const Counter = styled.h1`
+  grid-area: header;
+
+  font-size: 1em;
+  text-align: center;
+`;
+
+const MainSection = styled.section`
   grid-area: main;
 
   display: flex;
@@ -244,21 +262,20 @@ const FloatingSection = styled.section`
   align-items: center;
 `;
 
-const FlexButtonGroup = styled.div`
+const NavigationFooter = styled.section`
+  grid-area: footer;
+  
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
-`;
 
-const CenteredButtonGroup = styled(FlexButtonGroup)`
-  grid-area: footer;
-  flex-wrap: nowrap;
   margin-top: 1em;
   margin-bottom: 1em;
+  background: #f5f6fa;
 
   & button {
-    width: 15em;
+    width: 10em;
 
     & + button {
       margin-left: 1em;
@@ -266,12 +283,4 @@ const CenteredButtonGroup = styled(FlexButtonGroup)`
   }
 `;
 
-const Title = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-`;
 
-const Counter = styled(Title)`
-  font-size: 1em;
-  grid-area: header;
-`;

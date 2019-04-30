@@ -8,6 +8,7 @@ export const BigButton = styled.button`
   font-weight: 700;
   padding: 1em;
   border-radius: 2px;
+  border: none;
 `;
 
 export const MediumButton = styled.button`
@@ -18,15 +19,17 @@ export const MediumButton = styled.button`
   font-weight: bold;
   padding: .8em;
   border-radius: 2px;
+  border: none;
 `;
 
 export const SmallButton = styled.button`
   text-transform: lowercase;
-  font-size: .90em;
+  font-size: .7em;
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   padding: .50em
   border-radius: 2px;
+  border: none;
 `;
 
 export default { BigButton, MediumButton, SmallButton };
