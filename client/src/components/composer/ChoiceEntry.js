@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Form from './common/Form';
+import Form from '../common/Form';
 import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
-import { SmallButton } from './common/base/ButtonBase';
-import { MediumInput } from './common/base/InputBase';
-import CodeEditor from './CodeEditor';
+import { SmallButton } from '../common/Button';
+import { MediumInput } from '../common/Input';
+import CodeEditor from '../editor/CodeEditor';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 
@@ -28,22 +28,24 @@ const ChoiceEntry = ({
       <Title>{title}</Title>
 
       {problemType.DISPLAY_NAME === "Advanced Multiple Answer" &&
-        <CodeEditor
-          code={code}
-          setCode={() => { return; }}
-          options={{ readOnly: true }}
-        />
+        <>
+          <CodeEditor
+            code={code}
+            setCode={() => { return; }}
+            options={{ readOnly: true }}
+          />
+          <FlexButtonGroup>
+            <SmallButton
+              onClick={toggleMarkdown}
+            >
+              {allowMarkdown
+                ? "Markdown in Answers Enabled"
+                : "Markdown in Answers Disabled"
+              }
+            </SmallButton>
+          </FlexButtonGroup>
+        </>
       }
-      <FlexButtonGroup>
-        <SmallButton
-          onClick={toggleMarkdown}
-        >
-          {allowMarkdown
-            ? "Markdown in Answers Enabled"
-            : "Markdown in Answers Disabled"
-          }
-        </SmallButton>
-      </FlexButtonGroup>
 
       <ChoiceComposerWrapper className="choice-composer">
         <ChoiceInput className="choice-input-form">
@@ -177,8 +179,6 @@ const ChoiceList = styled.div`
   align-items: center;
 
   width: 100%;
-  max-height: 50vh;
-  overflow: scroll;
 `;
 
 const InputWrapper = styled.div`

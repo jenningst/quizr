@@ -1,29 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton } from './common/base/ButtonBase';
+import { BigButton } from '../common/Button';
 import ProblemType from './ProblemType';
 import ProblemStatement from './ProblemStatement';
 import ChoiceEntry from './ChoiceEntry';
 
-const QuestionComposer = ({ modes }) => {
-  const [problemType, setProblemType] = useState(null);
-  const [step, setStep] = useState(1);
-  const [maxStepAllowed, setMaxStepAllowed] = useState(1);
+const QuestionComposer = ({ 
+  modes,
+  currentStep,
+  maxStepAllowed,
+  setCurrentStep,
+  setMaxStep,
+  problemType,
+  setProblemType
+}) => {
   const [title, setTitle] = useState("");
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
   const [code, setCode] = useState("// Start typing to add code...");
 
   const totalSteps = 3; // TODO: figure out where to put this; DUMMY DATA
-  // console.log(modes);
 
   // hook for problemType validation
   useEffect(() => {
     // if problemType is selected, allow navigation forward
     if (problemType) 
     {
-      setMaxStepAllowed(2);
+      setMaxStep(2);
     };
   }, [problemType]);
 
@@ -32,9 +36,9 @@ const QuestionComposer = ({ modes }) => {
     // if title, allow navigation forward
     if (problemType) {
       if (title) {
-        setMaxStepAllowed(3);
+        setMaxStep(3);
       } else {
-        setMaxStepAllowed(2);
+        setMaxStep(2);
       }
     }
   }, [title]);
@@ -46,12 +50,12 @@ const QuestionComposer = ({ modes }) => {
       if (choiceCache.length >= 4) {
         // if one of the choices is an answer, allow navigation forward
         if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
-          setMaxStepAllowed(4);
+          setMaxStep(4);
         } else {
-          setMaxStepAllowed(3);
+          setMaxStep(3);
         }
       } else {
-        setMaxStepAllowed(3);
+        setMaxStep(3);
       }
     }
   }, [choiceCache]);
@@ -59,7 +63,7 @@ const QuestionComposer = ({ modes }) => {
   return (
     <ComposeQuestionWrapper className="composer-carousel">
       <Header>
-        <Counter className="composer-counter">STEP {step}</Counter>
+        <Counter className="composer-counter">STEP {currentStep}</Counter>
       </Header>
 
         <MainSection>
@@ -69,17 +73,17 @@ const QuestionComposer = ({ modes }) => {
       <NavigationFooter className="composer-navigation">
         <BigButton
           name="previous"
-          disabled={step === 1 ? 'disabled' : null}
+          disabled={currentStep === 1 ? 'disabled' : null}
           onClick={movePage}
         >
           Previous
         </BigButton>
         <BigButton
           name="next"
-          disabled={step === maxStepAllowed ? 'disabled' : null}
-          onClick={step === totalSteps ? submitProblem : movePage}
+          disabled={currentStep === maxStepAllowed ? 'disabled' : null}
+          onClick={currentStep === totalSteps ? submitProblem : movePage}
         >
-          {step === totalSteps ? 'Submit' : 'Next'}
+          {currentStep === totalSteps ? 'Submit' : 'Next'}
         </BigButton> 
       </NavigationFooter>
 
@@ -87,13 +91,13 @@ const QuestionComposer = ({ modes }) => {
   );
 
   function renderStep() {
-    switch (step) {
+    switch (currentStep) {
       case 1:
         return (
           <ProblemType
             modes={modes}
             problemType={problemType}
-            toggleSelect={toggleSelect}
+            setProblemType={setProblemType}
           />
         );
       case 2:
@@ -127,16 +131,16 @@ const QuestionComposer = ({ modes }) => {
   // Sets the step state
   function movePage(e) {
     if (e.target.name === "previous") {
-      setStep(step - 1);
+      setCurrentStep(currentStep - 1);
       return;
     }
-    setStep(step + 1);
+    setCurrentStep(currentStep + 1);
   }
 
-  // Toggles the problem type selected
-  function toggleSelect(index) {
-    setProblemType(modes[index]);
-  }
+  // // Toggles the problem type selected
+  // function toggleSelect(index) {
+  //   setProblemType(modes[index]);
+  // }
 
   // Sets the problem title
   function updateTitle(payload) {
@@ -221,6 +225,9 @@ QuestionComposer.propTypes = {
     ALLOW_MARKDOWN: PropTypes.bool.isRequired,
     CODE_EDITOR: PropTypes.bool.isRequired,
   })).isRequired,
+  currentStep: PropTypes.number.isRequired,
+  maxStepAllowed: PropTypes.number.isRequired,
+  setMaxStep: PropTypes.func.isRequired,
 }
 
 export default QuestionComposer;

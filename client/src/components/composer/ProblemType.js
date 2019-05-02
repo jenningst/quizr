@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton } from './common/base/ButtonBase';
+import { BigButton } from '../common/Button';
 
-const ProblemType = ({ modes, problemType, toggleSelect, }) => {
+const ProblemType = ({ modes, problemType, setProblemType }) => {
   return (
     <>
       <Title className="page-title">What type of problem is this?</Title>
@@ -13,7 +13,7 @@ const ProblemType = ({ modes, problemType, toggleSelect, }) => {
             key={index}
             index={index}
             name={mode.DISPLAY_NAME}
-            onClick={() => setAsProblem(index)}
+            onClick={() => setProblemType(index)}
             active={problemType === mode.DISPLAY_NAME}
           >
             {mode.DISPLAY_NAME}
@@ -23,10 +23,10 @@ const ProblemType = ({ modes, problemType, toggleSelect, }) => {
     </>
   );
 
-  // Sets the selected problem type as the selection
-  function setAsProblem(index) {
-    toggleSelect(index);
-  }
+  // // Sets the selected problem type as the selection
+  // function handleClick(index) {
+  //   selectProblemType(index);
+  // }
 };
 
 ProblemType.propTypes = {
@@ -40,7 +40,7 @@ ProblemType.propTypes = {
     ALLOW_MARKDOWN: PropTypes.bool.isRequired,
     CODE_EDITOR: PropTypes.bool.isRequired,
   }),
-  toggleSelect: PropTypes.func.isRequired,
+  setProblemType: PropTypes.func.isRequired,
 };
 
 export default ProblemType;

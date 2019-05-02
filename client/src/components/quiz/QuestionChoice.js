@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
+import { BigButton, MediumButton, SmallButton } from '../common/Button';
 
 const QuestionChoice = ({
   index,

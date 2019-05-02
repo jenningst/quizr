@@ -1,23 +1,8 @@
 import React from 'react';
-import { MODES as COMPOSER_MODES } from '../constants/composerModes';
-import QuestionComposer from './QuestionComposer';
-import ChoiceItem_Updated from './ChoiceItem';
-import styled from 'styled-components';
-import OptionsCard from './OptionsCard';
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Composer from '../containers/Composer';
 
-const App = () => {
-  return (
-    <AppWrapper>
-      <QuestionComposer modes={COMPOSER_MODES}/>
-    </AppWrapper>
-  );
-};
+const App = () => (
+    <Composer />
+);
 
 export default App;
-
-const AppWrapper = styled.div`
-  margin: 0;
-  padding: 0;
-`;

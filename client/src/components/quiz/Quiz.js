@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Question from './AnswerQuestion';
-import AnswerKey from './AnswerKey';
+import Question from './Question';
+import AnswerKey from '../AnswerKey';
 import Assessment from './Assessment';
 import styled from 'styled-components';
-import { SAMPLE_QUESTIONS } from '../constants/sampleQuestions';
+import { SAMPLE_QUESTIONS } from '../../constants/sampleQuestions';
 
-import { objectsAreEqual } from '../utilities/helpers'; 
+import { objectsAreEqual } from '../../utilities/helpers'; 
 
 const Quiz = ({ mode }) => {
   const [questions, setQuestions] = useState([]);
@@ -20,6 +20,14 @@ const Quiz = ({ mode }) => {
       setQuestions(SAMPLE_QUESTIONS);
     }
     if (mode.PRELOAD_QUESTIONS) preloadQuestions();
+  }, []);
+
+  // Mask the questions answer key
+  useEffect(() => {
+    function maskQuestionAnswerKey() {
+      setQuestions(maskAnswerKey(SAMPLE_QUESTIONS));
+    }
+    maskQuestionAnswerKey();
   }, []);
 
   return (
@@ -55,17 +63,12 @@ const Quiz = ({ mode }) => {
     </QuizWrapper>
   );
 
-  // function hydrateResponseBeforeGrade(choicePayload) {
-  //   // call gradeResponse() with some other key data
-  //   const MODE = mode;
-  //   let response = gradeResponse(MODE, question, choicePayload);
-  // }
-
-  // function maskAnswerKey(question) {
-  //   // Removes answer from a question object
-  //   let cleansedQuestion = { ...question };
-  //   return cleansedQuestion.choices.forEach(choice => choice.isAnswer = null);
-  // }
+  // Masks the answers from an array of questions
+  function maskQuestionAnswerKey(array) {
+    // Removes answer from a question object
+    let maskedQuestions = [ ...array ];
+    return maskedQuestions.choices.forEach(choice => choice.isAnswer = null);
+  }
 
   // REFACTOR: make this async on the server
   // Checks the validity of a choices payload from Question

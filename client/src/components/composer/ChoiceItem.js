@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
-import { BigInput, MediumInput, SmallInput } from './common/base/InputBase';
-import Button from 'react-bootstrap';
-import OptionsCard from './OptionsCard';
+import { SmallButton } from '../common/Button';
+import { SmallInput } from '../common/Input';
+// import OptionsCard from '../OptionsCard';
 import Markdown from 'markdown-to-jsx';
 
 const ChoiceItem = ({
@@ -76,10 +75,10 @@ const ChoiceItem = ({
     </ChoiceItemWrapper>
   );
 
-  // Toggles displayMenu state and displays/hides the OptionsCard component
-  function toggleEditMenu(){
-    setDisplayMenu(!displayMenu)
-  }
+  // // Toggles displayMenu state and displays/hides the OptionsCard component
+  // function toggleEditMenu(){
+  //   setDisplayMenu(!displayMenu)
+  // }
 
   // Handle input field changes
   function handleInputChange(e) {
@@ -121,11 +120,12 @@ ChoiceItem.propTypes = {
 export default ChoiceItem;
 
 const ChoiceItemWrapper = styled.div`
-  width: 100%;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
   align-items: center;
+
+  width: 100%;
   color: #48494e;
   background: #ffffff;
 
@@ -142,6 +142,7 @@ const ChoiceItemWrapper = styled.div`
 
 const Label = styled.div`
   flex-grow: 2;
+
   font-size: .70em;
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
@@ -151,12 +152,14 @@ const Label = styled.div`
 
 const Input = styled(SmallInput)`
   flex-grow: 2;
+
   border: 2px solid #ffffff;
   border-bottom: 2px solid #7358f7;
 `;
 
 const TextArea = styled.textarea`
   flex-grow: 2;
+
   font-size: .70em;
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;

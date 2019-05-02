@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { SmallButton } from './common/base/ButtonBase';
-import { MediumInput } from './common/base/InputBase';
-import CodeEditor from './CodeEditor';
+import { SmallButton } from '../common/Button';
+import CodeEditor from '../editor/CodeEditor';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/theme/dracula.css';
 
