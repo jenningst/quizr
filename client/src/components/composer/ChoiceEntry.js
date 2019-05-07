@@ -4,15 +4,8 @@ import Form from '../common/Form';
 import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
 import { SmallButton } from '../common/Button';
-import { MediumInput } from '../common/Input';
-import CodeEditor from '../editor/CodeEditor';
-import 'codemirror/lib/codemirror.css';
-import 'codemirror/theme/dracula.css';
 
 const ChoiceEntry = ({
-  problemType,
-  title,
-  code,
   choiceCache,
   toggleIsAnswer,
   addChoice, 
@@ -24,66 +17,28 @@ const ChoiceEntry = ({
   const [allowMarkdown, setAllowMarkdown] = useState(false);
 
   return (
-    <PageWrapper>
-      <Title>{title}</Title>
-
-      {problemType.DISPLAY_NAME === "Advanced Multiple Answer" &&
-        <>
-          <CodeEditor
-            code={code}
-            setCode={() => { return; }}
-            options={{ readOnly: true }}
-          />
-          <FlexButtonGroup>
-            <SmallButton
-              onClick={toggleMarkdown}
-            >
-              {allowMarkdown
-                ? "Markdown in Answers Enabled"
-                : "Markdown in Answers Disabled"
-              }
-            </SmallButton>
-          </FlexButtonGroup>
-        </>
-      }
-
-      <ChoiceComposerWrapper className="choice-composer">
-        <ChoiceInput className="choice-input-form">
+      <ChoiceComposerWrapper className="choice-entry-wrapper">
+        <FormWrapper className="form-wrapper">
           <Form onSubmit={addNewChoice}>
             <InputWrapper className="form-input-wrapper">
-              {allowMarkdown 
-                ? <TextArea
-                    rows="3"
-                    cols="20"
-                    name="choice-text"
-                    value={choiceText}
-                    onChange={handleInputChange}
-                    placeholder="Start typing a choice ..."
-                  />
-                : <Input 
-                    name="choice-text"
-                    value={choiceText}
-                    onChange={handleInputChange}
-                    placeholder="Start typing a choice ..."
-                  />
-              }
-              <EmbeddedButton
-                type="submit"
-              >
-                Add
-              </EmbeddedButton>
+              <ChoiceInput 
+                name="choice-text"
+                value={choiceText}
+                onChange={handleInputChange}
+                placeholder="Start typing a choice ..."
+              />
+              <EmbeddedButton type="submit">Add</EmbeddedButton>
             </InputWrapper>
           </Form>
-        </ChoiceInput>
-        <ChoiceList className="choice-list">
+        </FormWrapper>
+        <ChoiceList>
           {choiceCache &&
-            choiceCache.map(choice => {
-              const { index, isAnswer, text } = choice;
+            choiceCache.map((choice, index) => {
+              const { isAnswer, text } = choice;
               return (
                 <ChoiceItem
                   key={index}
                   index={index}
-                  allowMarkdown={allowMarkdown}
                   choiceText={text}
                   isAnswer={isAnswer}
                   toggleIsAnswer={toggleIsAnswer}
@@ -95,7 +50,6 @@ const ChoiceEntry = ({
           }
         </ChoiceList>
       </ChoiceComposerWrapper>
-    </PageWrapper>
   );
 
   // Handles changes for input fields
@@ -117,11 +71,6 @@ const ChoiceEntry = ({
 };
 
 ChoiceEntry.propTypes = {
-  problemType: PropTypes.shape({
-    DISPLAY_NAME: PropTypes.string.isRequired,
-    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
-    CODE_EDITOR: PropTypes.bool.isRequired,
-  }),
   title: PropTypes.string.isRequired,
   choiceCache: PropTypes.arrayOf(PropTypes.shape({
     index: PropTypes.number.isRequired,
@@ -136,40 +85,33 @@ ChoiceEntry.propTypes = {
 
 export default ChoiceEntry;
 
-const PageWrapper = styled.div`
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: center;
-  align-items: center;
-
-  width: 100%;
-  height: auto;
-`;
-
-const Title = styled.h1`
-  font-size: 1.5em;
-  text-align: center;
-`;
-
 const ChoiceComposerWrapper = styled.div`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
   align-items: center;
 
-  padding-left: 1em;
-  padding-right: 1em;
   width: 100%;
-  max-width: 950px;
+`;
 
-  & form {
-    margin-bottom: 1em;
-    flex-grow: 2;
+const ChoiceInput = styled.input`
+  width: 100%;
+  flex-grow: 2;
+  font-size: .70em;
+  font-family: 'Montserrat', sans-serif;
+  padding: .50em
+  border: none;
+  outline: none;
+  resize: none;
+
+  &::placeholder {
+    color: #c0c0c0;
   }
 `;
 
-const ChoiceInput = styled.div`
+const FormWrapper = styled.div`
   width: 100%;
+  margin-bottom: .50em;
 `;
 
 const ChoiceList = styled.div`
@@ -202,32 +144,6 @@ const InputWrapper = styled.div`
   }
 `;
 
-const TextArea = styled.textarea`
-  flex-grow: 2;
-
-  width: 100%;
-  font-size: .70em;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
-  padding: .50em
-  border: none;
-  resize: none;
-
-  &::placeholder {
-    color: #c0c0c0;
-  }
-`;
-
-const Input = styled(MediumInput)`
-  width: 100%;
-  border: none;
-  outline: none;
-
-  &::placeholder {
-    color: #c0c0c0;
-  }
-`;
-
 const EmbeddedButton = styled(SmallButton)`
   font-size: .70em;
   margin-right: .5em;
@@ -239,13 +155,4 @@ const EmbeddedButton = styled(SmallButton)`
   &:hover {
     background: #8B90FF;
   }
-`;
-
-const FlexButtonGroup = styled.div`
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: center;
-  align-items: center;
-
-  margin-bottom: 1em;
 `;

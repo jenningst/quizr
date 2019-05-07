@@ -1,175 +1,101 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton } from '../common/Button';
-import ProblemType from './ProblemType';
-import ProblemStatement from './ProblemStatement';
 import ChoiceEntry from './ChoiceEntry';
+import { BigButton } from '../common/Button';
 
-const QuestionComposer = ({ 
-  modes,
-  currentStep,
-  maxStepAllowed,
-  setCurrentStep,
-  setMaxStep,
-  problemType,
-  setProblemType
-}) => {
-  const [title, setTitle] = useState("");
+import { Mutation } from 'react-apollo';
+import { CREATE_QUESTION, GET_QUESTIONS } from '../../queries/question';
+
+const QuestionComposer = () => {
+  const [title, setTitle] = useState('');
   const [choiceCache, setChoiceCache] = useState([]);
   const [choiceIncrementer, setChoiceIncrementer] = useState(0);
-  const [code, setCode] = useState("// Start typing to add code...");
+  const [hasAnswer, setHasAnswer] = useState(false);
+  const isInvalid = title === '' || choiceCache.length < 5 || !hasAnswer;
+  
+  const input = { title, choices: choiceCache };
 
-  const totalSteps = 3; // TODO: figure out where to put this; DUMMY DATA
-
-  // hook for problemType validation
   useEffect(() => {
-    // if problemType is selected, allow navigation forward
-    if (problemType) 
-    {
-      setMaxStep(2);
-    };
-  }, [problemType]);
-
-  // hook for title validation
-  useEffect(() => {
-    // if title, allow navigation forward
-    if (problemType) {
-      if (title) {
-        setMaxStep(3);
-      } else {
-        setMaxStep(2);
+    if (choiceCache.length > 0) {
+      if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
+        setHasAnswer(true);
+        return;
       }
-    }
-  }, [title]);
-
-  // hook for choice validation
-  useEffect(() => {
-    // if number of choices is at least 4...
-    if (problemType && title) {
-      if (choiceCache.length >= 4) {
-        // if one of the choices is an answer, allow navigation forward
-        if (choiceCache.filter(c => c.isAnswer === true).length > 0) {
-          setMaxStep(4);
-        } else {
-          setMaxStep(3);
-        }
-      } else {
-        setMaxStep(3);
-      }
+      setHasAnswer(false);
     }
   }, [choiceCache]);
 
   return (
-    <ComposeQuestionWrapper className="composer-carousel">
-      <Header>
-        <Counter className="composer-counter">STEP {currentStep}</Counter>
-      </Header>
-
-        <MainSection>
-          {renderStep()}
-        </MainSection>
-
-      <NavigationFooter className="composer-navigation">
-        <BigButton
-          name="previous"
-          disabled={currentStep === 1 ? 'disabled' : null}
-          onClick={movePage}
-        >
-          Previous
-        </BigButton>
-        <BigButton
-          name="next"
-          disabled={currentStep === maxStepAllowed ? 'disabled' : null}
-          onClick={currentStep === totalSteps ? submitProblem : movePage}
-        >
-          {currentStep === totalSteps ? 'Submit' : 'Next'}
-        </BigButton> 
-      </NavigationFooter>
-
-    </ComposeQuestionWrapper>
+    // <Mutation
+    //   mutation={CREATE_QUESTION}
+    //   update={(cache, { data: { createQuestion } }) => {
+    //     const { questions } = cache.readQuery({ query: GET_QUESTIONS });
+    //     cache.writeQuery({
+    //       query: GET_QUESTIONS,
+    //       data: { questions: questions.concat([createQuestion]) }
+    //     });
+    //   }}
+    // >
+    //   {(createQuestion) => (
+        <ComposeQuestionWrapper>
+          <Header>
+            <Title>{JSON.stringify(choiceCache)}</Title>
+          </Header>
+          <Main>
+            <TextAreaWrapper>
+              <TitleTextArea
+                rows="2"
+                cols="15"
+                name="question-text"
+                placeholder="Start typing your question ..."
+                value={title}
+                onChange={handleTitleChange}
+              />
+            </TextAreaWrapper>
+            {title 
+              ? <ChoiceEntry 
+                  className="choice-entry"
+                  choiceCache={choiceCache}
+                  toggleIsAnswer={toggleIsAnswer}
+                  addChoice={addChoice}
+                  updateChoice={updateChoice}
+                  deleteChoice={deleteChoice}
+                /> 
+              : null}
+          </Main>
+            <Footer>
+              <BigButton
+                disabled={isInvalid}
+                type="button"
+              >
+                Submit
+              </BigButton>
+            </Footer>
+        </ComposeQuestionWrapper>
+    //   )}
+    // </Mutation>
   );
 
-  function renderStep() {
-    switch (currentStep) {
-      case 1:
-        return (
-          <ProblemType
-            modes={modes}
-            problemType={problemType}
-            setProblemType={setProblemType}
-          />
-        );
-      case 2:
-        return (
-          <ProblemStatement
-            problemType={problemType}
-            title={title}  
-            updateTitle={updateTitle}
-            code={code}
-            updateCode={updateCode}
-          />
-        );
-      case 3:
-        return (
-          <ChoiceEntry
-            problemType={problemType}
-            title={title}
-            code={code}
-            choiceCache={choiceCache}
-            toggleIsAnswer={toggleIsAnswer}
-            addChoice={addChoice}
-            updateChoice={updateChoice}
-            deleteChoice={deleteChoice}
-          />
-        );
-      default:
-       return null;
-    }
-  }
-
-  // Sets the step state
-  function movePage(e) {
-    if (e.target.name === "previous") {
-      setCurrentStep(currentStep - 1);
-      return;
-    }
-    setCurrentStep(currentStep + 1);
-  }
-
-  // // Toggles the problem type selected
-  // function toggleSelect(index) {
-  //   setProblemType(modes[index]);
-  // }
-
-  // Sets the problem title
-  function updateTitle(payload) {
-    setTitle(payload);
+  // Handles changes for input fields
+  function handleTitleChange(e) {
+    setTitle(e.target.value);
   }
 
   // Toggles whether a choice is a valid answer
   function toggleIsAnswer(index) {
-    let updatedCache = [ ...choiceCache ];
-    // find object with the correct index
-    const result = updatedCache.findIndex(choice => choice.index === index);
-    if (result !== -1) {
-      // toggle isAnswer property
-      updatedCache[result].isAnswer = !updatedCache[result].isAnswer;
+    if (index > -1) {
+      let updatedCache = [ ...choiceCache ];
+      updatedCache[index].isAnswer = !updatedCache[index].isAnswer;
       setChoiceCache(updatedCache);
     }
   }
 
-  // Handles code editor changes
-  function updateCode(newCode) {
-    setCode(newCode);
-  }
-
   // Creates a new, blank choice template in state
-  function addChoice(payload) {
-    // setup choice payload
+  function addChoice(choiceText) {
+    // setup choice choiceText
     const newChoice = { 
-      index: choiceIncrementer,
-      text: payload,
+      text: choiceText,
       isAnswer: false,
     };
     setChoiceCache([...choiceCache, newChoice ]);
@@ -178,53 +104,35 @@ const QuestionComposer = ({
 
   // Deletes an existing choice from state
   function deleteChoice(index) {
-    let updatedCache = [ ...choiceCache ];
-    // find object with the correct index
-    const result = updatedCache.findIndex(choice => choice.index === index);
-    if (result !== -1) {
+    if (index > -1) {
+      console.log(index);
+      let updatedCache = [ ...choiceCache ];
+      // find object with the correct index
       let choices;
-      if (result === 0) { // result was first element
+      if (index === 0) { // result was first element
         choices = updatedCache.slice(1);
-      } else if (result === updatedCache.length - 1) { // result is last element
-        choices = updatedCache.slice(0, -1);
       } else { // result was element other than first or last
-        choices = [
-          ...updatedCache.slice(0, result),
-          ...updatedCache.slice(result + 1)];
+        updatedCache.splice(index, 1);
+        choices = updatedCache;
       }
       setChoiceCache(choices);
     }
   }
 
   // Updates an existing choice from state
-  function updateChoice(choicePayload) {
-    if (choicePayload && choicePayload.index > -1) {
+  function updateChoice(index, choicePayload) {
+    if (choicePayload && index > -1) {
+      // copy state and update
       let updatedCache = [ ...choiceCache ];
-      const result = updatedCache.findIndex(c => c.index === choicePayload.index);
-      if (result !== -1) {
-        // update state properties for the input in state
-        updatedCache[result].text = choicePayload.text;
-        updatedCache[result].isAnswer = choicePayload.isAnswer;
-        // update state
-        setChoiceCache(updatedCache);
-      }
+      updatedCache[index].text = choicePayload.text;
+      updatedCache[index].isAnswer = choicePayload.isAnswer;
+      setChoiceCache(updatedCache);
     }
   }
 
-  // Saves the problem
-  function submitProblem(e) {
-    e.preventDefault();
-    // TODO: Submit the problem
-    alert('You submitted!');
-  }
 };
 
 QuestionComposer.propTypes = {
-  modes: PropTypes.arrayOf(PropTypes.shape({
-    DISPLAY_NAME: PropTypes.string.isRequired,
-    ALLOW_MARKDOWN: PropTypes.bool.isRequired,
-    CODE_EDITOR: PropTypes.bool.isRequired,
-  })).isRequired,
   currentStep: PropTypes.number.isRequired,
   maxStepAllowed: PropTypes.number.isRequired,
   setMaxStep: PropTypes.func.isRequired,
@@ -234,60 +142,64 @@ export default QuestionComposer;
 
 const ComposeQuestionWrapper = styled.div`
   display: grid;
-  grid-template-rows: 2em 1fr 5em;
+  grid-template-rows: 3em auto 3em;
   grid-template-areas:
     "header"
-    "main"
-    "footer";
-  width: auto;
-  height: 100vh;
-  font-family: 'Montserrat', sans-serif;
-  color: #333333;
+     "main"
+     "footer";
+  width: auto
+  height: 94vh;
   background: #f5f6fa;
+  padding: 1em;
 `;
 
 const Header = styled.header`
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  align-items: center;
-`;
-
-const Counter = styled.h1`
   grid-area: header;
+`;
 
-  font-size: 1em;
+const Title = styled.h1`
+  grid-area: header;
+  font-family: 'Montserrat', sans-serif;
+  color: #333333;
+  font-size: 1.25em;
   text-align: center;
+  margin-bottom: .50em;
 `;
 
-const MainSection = styled.section`
+const Main = styled.section`
   grid-area: main;
-
-  display: flex;
-  flex-flow: column nowrap;
-  justify-content: flex-start;
-  align-items: center;
 `;
 
-const NavigationFooter = styled.section`
-  grid-area: footer;
-  
+const TextAreaWrapper = styled.div`
   display: flex;
   flex-flow: row nowrap;
   justify-content: center;
   align-items: center;
 
-  margin-top: 1em;
-  margin-bottom: 1em;
-  background: #f5f6fa;
+  width: 100%;
+  max-width: 950px;
+  margin-bottom: .50em;
+`;
 
-  & button {
-    width: 10em;
+const TitleTextArea = styled.textarea`
+  width: 100%;
+  flex-grow: 2;
+  font-size: .70em;
+  font-family: 'Montserrat', sans-serif;
+  color: #333333;
+  padding: 1em;
+  border: none;
+  outline: none;
+  resize: none;
 
-    & + button {
-      margin-left: 1em;
-    }
+  &::placeholder {
+    color: #c0c0c0;
   }
 `;
 
-
+const Footer = styled.div`
+  grid-area: footer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;

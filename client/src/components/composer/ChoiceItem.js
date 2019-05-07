@@ -4,18 +4,15 @@ import styled from 'styled-components';
 import { SmallButton } from '../common/Button';
 import { SmallInput } from '../common/Input';
 // import OptionsCard from '../OptionsCard';
-import Markdown from 'markdown-to-jsx';
 
 const ChoiceItem = ({
   index,
-  allowMarkdown,
   choiceText,
   isAnswer,
   updateChoice,
   deleteChoice,
   toggleIsAnswer
 }) => {
-  const [displayMenu, setDisplayMenu] = useState(false);
   const [inputText, setInputText] = useState(choiceText);
   const [isEditable, setIsEditable] = useState(false);
 
@@ -28,15 +25,7 @@ const ChoiceItem = ({
         {!isEditable
           ? (
             <>
-              <Label>
-                {allowMarkdown 
-                  ? <Markdown options={{ forceBlock: true }}>
-                      {inputText}
-                    </Markdown>
-                  : <>{inputText}</>
-                }
-                
-              </Label>
+              <Label>{inputText}</Label>
               <AnswerButton
                 onClick={toggleAnswer}
                 active={isAnswer ? 'active' : null}
@@ -46,26 +35,17 @@ const ChoiceItem = ({
               <EditButton onClick={toggleIsEditable}>
                 {"..."}
               </EditButton>
+              <EditButton onClick={handleDelete}>
+                {"Delete"}
+              </EditButton>
             </>
           ) : (
             <>
-              {allowMarkdown
-                ? (
-                  <TextArea
-                    rows="3"
-                    cols="20"
-                    placeholder="text area text..."
-                    value={inputText}
-                    onChange={handleInputChange}
-                  />
-                ) : (
-                  <Input
-                    placeholder="input text ..."
-                    value={inputText}
-                    onChange={handleInputChange}
-                  />
-                )
-              }
+              <Input
+                placeholder="input text ..."
+                value={inputText}
+                onChange={handleInputChange}
+              />
               <SaveButton onClick={onSave}>
                 {"Save"}
               </SaveButton>
@@ -75,10 +55,10 @@ const ChoiceItem = ({
     </ChoiceItemWrapper>
   );
 
-  // // Toggles displayMenu state and displays/hides the OptionsCard component
-  // function toggleEditMenu(){
-  //   setDisplayMenu(!displayMenu)
-  // }
+  // Handles choice delete
+  function handleDelete(){
+    deleteChoice(index);
+  }
 
   // Handle input field changes
   function handleInputChange(e) {
@@ -99,17 +79,15 @@ const ChoiceItem = ({
   function onSave() {
     setIsEditable(!isEditable);
     const inputPayload = { // create a payload to match state
-      index,
       text: inputText,
       isAnswer,
     };
-    updateChoice(inputPayload); // send payload to parent
+    updateChoice(index, inputPayload); // send payload to parent
   }
 };
 
 ChoiceItem.propTypes = {
   index: PropTypes.number.isRequired,
-  allowMarkdown: PropTypes.bool.isRequired,
   choiceText: PropTypes.string.isRequired,
   isAnswer: PropTypes.bool.isRequired,
   updateChoice: PropTypes.func.isRequired,
