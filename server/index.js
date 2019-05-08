@@ -27,7 +27,7 @@ const app = express();
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 const apollo = new ApolloServer({ schema });
 
-// opt-in middleware; in this case, express itself
+// opt-in middleware; in this case, use express
 // this is how we use Apollo and express together
 apollo.applyMiddleware({ app, path: '/graphql' });
 

@@ -6,4 +6,9 @@ const choiceSchema = new Schema({
   isAnswer: Boolean,
 });
 
-module.exports = mongoose.model('Choice', choiceSchema);
+const questionSchema = new Schema({
+  title: String,
+  choices: [choiceSchema],
+});
+
+module.exports = mongoose.model('Question', questionSchema);
