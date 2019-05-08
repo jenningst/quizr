@@ -10,8 +10,8 @@ import { CREATE_QUESTION, GET_QUESTIONS } from '../../queries/question';
 const QuestionComposer = () => {
   const [title, setTitle] = useState('');
   const [choiceCache, setChoiceCache] = useState([]);
-  const [choiceIncrementer, setChoiceIncrementer] = useState(0);
   const [hasAnswer, setHasAnswer] = useState(false);
+  const [errors, setErrors] = useState(null);
   const isInvalid = title === '' || choiceCache.length < 5 || !hasAnswer;
   
   const input = { title, choices: choiceCache };
@@ -27,54 +27,68 @@ const QuestionComposer = () => {
   }, [choiceCache]);
 
   return (
-    // <Mutation
-    //   mutation={CREATE_QUESTION}
-    //   update={(cache, { data: { createQuestion } }) => {
-    //     const { questions } = cache.readQuery({ query: GET_QUESTIONS });
-    //     cache.writeQuery({
-    //       query: GET_QUESTIONS,
-    //       data: { questions: questions.concat([createQuestion]) }
-    //     });
-    //   }}
-    // >
-    //   {(createQuestion) => (
-        <ComposeQuestionWrapper>
-          <Header>
-            <Title>{JSON.stringify(choiceCache)}</Title>
-          </Header>
-          <Main>
-            <TextAreaWrapper>
-              <TitleTextArea
-                rows="2"
-                cols="15"
-                name="question-text"
-                placeholder="Start typing your question ..."
-                value={title}
-                onChange={handleTitleChange}
-              />
-            </TextAreaWrapper>
-            {title 
-              ? <ChoiceEntry 
-                  className="choice-entry"
-                  choiceCache={choiceCache}
-                  toggleIsAnswer={toggleIsAnswer}
-                  addChoice={addChoice}
-                  updateChoice={updateChoice}
-                  deleteChoice={deleteChoice}
-                /> 
-              : null}
-          </Main>
-            <Footer>
-              <BigButton
-                disabled={isInvalid}
-                type="button"
-              >
-                Submit
-              </BigButton>
-            </Footer>
-        </ComposeQuestionWrapper>
-    //   )}
-    // </Mutation>
+    <Mutation
+      mutation={CREATE_QUESTION}
+      update={(cache, { data: { createQuestion } }) => {
+        const { questions } = cache.readQuery({ query: GET_QUESTIONS });
+        cache.writeQuery({
+          query: GET_QUESTIONS,
+          data: { questions: questions.concat([createQuestion]) }
+        });
+      }}
+    >
+      {(createQuestion, { data }, loading, error) => {
+        if (loading) return <div>Loading...</div>;
+        if (error) return <div>`Error! ${error.message}`</div>;
+        if (data) {
+          console.log(JSON.stringify(data.createQuestion.details, null, 2));
+        }
+        
+        return (
+          <ComposeQuestionWrapper>
+            <Header>
+              <Title>Compose a Question</Title>
+            </Header>
+            <Main>
+              <TextAreaWrapper>
+                <TitleTextArea
+                  rows="2"
+                  cols="15"
+                  name="question-text"
+                  placeholder="Start typing your question ..."
+                  value={title}
+                  onChange={handleTitleChange}
+                />
+              </TextAreaWrapper>
+              {title 
+                ? <ChoiceEntry 
+                    className="choice-entry"
+                    choiceCache={choiceCache}
+                    toggleIsAnswer={toggleIsAnswer}
+                    addChoice={addChoice}
+                    updateChoice={updateChoice}
+                    deleteChoice={deleteChoice}
+                  /> 
+                : null}
+            </Main>
+              <Footer>
+                <p>{errors}</p>
+                <BigButton
+                  disabled={isInvalid}
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    createQuestion({ variables: { input } });
+                    clearInputs();
+                  }}
+                >
+                  Submit
+                </BigButton>
+              </Footer>
+          </ComposeQuestionWrapper>
+        )
+      }}
+    </Mutation>
   );
 
   // Handles changes for input fields
@@ -99,7 +113,6 @@ const QuestionComposer = () => {
       isAnswer: false,
     };
     setChoiceCache([...choiceCache, newChoice ]);
-    setChoiceIncrementer(choiceIncrementer + 1);
   }
 
   // Deletes an existing choice from state
@@ -130,6 +143,11 @@ const QuestionComposer = () => {
     }
   }
 
+  // Handles the clearing of all inputs after a submission
+  function clearInputs() {
+    setChoiceCache([]);
+    setTitle('');
+  }
 };
 
 QuestionComposer.propTypes = {

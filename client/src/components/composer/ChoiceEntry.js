@@ -14,7 +14,6 @@ const ChoiceEntry = ({
 }) => {
   // Local state for handling input changes and markdown toggle
   const [choiceText, setChoiceText] = useState("");
-  const [allowMarkdown, setAllowMarkdown] = useState(false);
 
   return (
       <ChoiceComposerWrapper className="choice-entry-wrapper">
@@ -57,11 +56,6 @@ const ChoiceEntry = ({
     setChoiceText(e.target.value);
   }
 
-  // Handles toggle for allowing markdown
-  function toggleMarkdown() {
-    setAllowMarkdown(!allowMarkdown);
-  }
-
   // Adds a new choice
   function addNewChoice(e) {
     e.preventDefault();
@@ -71,9 +65,7 @@ const ChoiceEntry = ({
 };
 
 ChoiceEntry.propTypes = {
-  title: PropTypes.string.isRequired,
   choiceCache: PropTypes.arrayOf(PropTypes.shape({
-    index: PropTypes.number.isRequired,
     text: PropTypes.string.isRequired,
     isAnswer: PropTypes.bool.isRequired,
   }).isRequired,),

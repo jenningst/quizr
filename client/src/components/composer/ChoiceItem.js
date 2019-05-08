@@ -135,17 +135,6 @@ const Input = styled(SmallInput)`
   border-bottom: 2px solid #7358f7;
 `;
 
-const TextArea = styled.textarea`
-  flex-grow: 2;
-
-  font-size: .70em;
-  font-family: 'Montserrat', sans-serif;
-  font-weight: 400;
-  padding: .50em
-  border: none;
-  resize: none;
-`;
-
 const AnswerButton = styled(SmallButton)`
   font-size: .50em;
   padding-left: 1em;
