@@ -1,0 +1,28 @@
+{
+  "name": "quizr",
+  "version": "1.0.0",
+  "description": "A simple application to create and take short quizzes.",
+  "main": "index.js",
+  "dependencies": {
+    "concurrently": "^4.1.0"
+  },
+  "devDependencies": {
+    "husky": "^2.2.0",
+    "prettier": "^1.17.0",
+    "pretty-quick": "^1.10.0"
+  },
+  "scripts": {
+    "start": "concurrently \"cd server && nodemon index.js\" \"cd client && npm start\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jenningst/quizr.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jenningst/quizr/issues"
+  },
+  "homepage": "https://github.com/jenningst/quizr#readme"
+}

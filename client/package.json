@@ -1,14 +1,14 @@
 {
-  "name": "quizr",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "codemirror": "^5.46.0",
-    "i": "^0.3.6",
-    "markdown-to-jsx": "^6.9.4",
+    "apollo-boost": "^0.3.1",
+    "eslint-plugin-react-hooks": "^1.6.0",
     "npm": "^6.9.0",
     "react": "^16.8.6",
-    "react-codemirror2": "^5.1.0",
+    "react-apollo": "^2.5.2",
+    "react-apollo-hooks": "^0.4.3",
     "react-dom": "^16.8.6",
     "react-redux": "^7.0.3",
     "react-scripts": "2.1.8",
@@ -24,7 +24,17 @@
     "prettier-watch": "onchange '**/*.js' -- prettier --write {{changed}}"
   },
   "eslintConfig": {
-    "extends": ["plugin:prettier/recommended", "react-app"]
+    "extends": [
+      "plugin:prettier/recommended",
+      "react-app"
+    ],
+    "plugins": [
+      "react-hooks"
+    ],
+    "rules": {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
+    }
   },
   "browserslist": [
     ">0.2%",
@@ -35,5 +45,6 @@
   "devDependencies": {
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-prettier": "^3.0.1"
-  }
+  },
+  "proxy": "http://localhost:3001"
 }
