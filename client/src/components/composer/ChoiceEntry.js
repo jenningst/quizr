@@ -91,6 +91,7 @@ const ChoiceInput = styled.input`
   flex-grow: 2;
   font-size: .70em;
   font-family: 'Montserrat', sans-serif;
+  background: #F5F6FA;
   padding: .50em
   border: none;
   outline: none;

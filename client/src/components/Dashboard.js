@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import Home from './Home';
 import Quiz from './quiz/Quiz';
-import QuestionComposer from './composer/QuestionComposer';
+import ComposerContainer from '../containers/ComposerContainer';
 
 const Dashboard = () => {
   return (
@@ -29,9 +29,8 @@ const Dashboard = () => {
         <Main className='main'>
           <Route exact path='/' component={Home} />
           <Route path='/take-a-quiz' component={Quiz} />
-          <Route path='/question-composer' component={QuestionComposer} />
+          <Route path='/question-composer' component={ComposerContainer} />
         </Main>
-        <Footer className='footer' />
       </PageWrapper>
     </Router>
   );
@@ -42,11 +41,10 @@ export default Dashboard;
 const PageWrapper = styled.div`
   display: grid;
   grid-template-columns: 4em 1fr;
-  grid-template-rows: 3em 1fr 3em;
+  grid-template-rows: 3em 1fr;
   grid-template-areas:
     'logo topbar'
-    'sidebar main'
-    'footer footer';
+    'sidebar main';
   height: 100vh;
 `;
 
@@ -70,9 +68,4 @@ const Topbar = styled.section`
 const Main = styled.section`
   grid-area: main;
   background: #FFFFFF;
-`;
-
-const Footer = styled.footer`
-  grid-area: footer;
-  background: #BA5163;
 `;

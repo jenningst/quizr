@@ -43,4 +43,12 @@ const GET_QUESTIONS = gql`
   }
 `;
 
-export { CREATE_QUESTION, GET_QUESTIONS };
+const GET_QUESTION_COUNT = gql`
+  query fetchQuestionCount {
+    fetchQuestionCount {
+      count
+    }
+  }
+`;
+
+export { CREATE_QUESTION, GET_QUESTIONS, GET_QUESTION_COUNT };

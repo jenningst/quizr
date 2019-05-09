@@ -45,11 +45,11 @@ const QuestionComposer = () => {
         }
         
         return (
-          <ComposeQuestionWrapper>
+          <ComposeQuestionWrapper className="question-composer-wrapper">
             <Header>
               <Title>Compose a Question</Title>
             </Header>
-            <Main>
+            <Main className="question-composer-main">
               <TextAreaWrapper>
                 <TitleTextArea
                   rows="2"
@@ -71,7 +71,7 @@ const QuestionComposer = () => {
                   /> 
                 : null}
             </Main>
-              <Footer>
+              <Footer className="question-composer-footer">
                 <p>{errors}</p>
                 <BigButton
                   disabled={isInvalid}
@@ -159,29 +159,35 @@ QuestionComposer.propTypes = {
 export default QuestionComposer;
 
 const ComposeQuestionWrapper = styled.div`
+  box-sizing: border-box;
   display: grid;
   grid-template-rows: 3em auto 3em;
+  grid-row-gap: .50em;
   grid-template-areas:
     "header"
      "main"
      "footer";
-  width: auto
-  height: 94vh;
-  background: #f5f6fa;
+  width: auto;
+  height: 100%;
+
   padding: 1em;
+
+  background: #FFFFFF;
+  border-radius: 5px;
 `;
 
 const Header = styled.header`
   grid-area: header;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const Title = styled.h1`
-  grid-area: header;
   font-family: 'Montserrat', sans-serif;
   color: #333333;
   font-size: 1.25em;
   text-align: center;
-  margin-bottom: .50em;
 `;
 
 const Main = styled.section`
@@ -204,6 +210,7 @@ const TitleTextArea = styled.textarea`
   flex-grow: 2;
   font-size: .70em;
   font-family: 'Montserrat', sans-serif;
+  background: #F5F6FA;
   color: #333333;
   padding: 1em;
   border: none;
