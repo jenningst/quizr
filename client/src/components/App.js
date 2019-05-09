@@ -1,8 +1,8 @@
 import React from 'react';
-import Composer from '../containers/Composer';
+import Dashboard from './Dashboard';
 
 const App = () => (
-    <Composer />
+    <Dashboard />
 );
 
 export default App;

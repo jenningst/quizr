@@ -1,79 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Question from './Question';
-import AnswerKey from '../AnswerKey';
 import Assessment from './Assessment';
 import styled from 'styled-components';
 import { SAMPLE_QUESTIONS } from '../../constants/sampleQuestions';
+import { MODES } from '../../constants/quizModes';
 
-import { objectsAreEqual } from '../../utilities/helpers'; 
+import { Query } from 'react-apollo';
+import { GET_QUESTIONS } from '../../queries/question';
 
-const Quiz = ({ mode }) => {
-  const [questions, setQuestions] = useState([]);
+import { objectsAreEqual } from '../../utilities/helpers';
+
+const Quiz = () => {
+  const mode = MODES.ADAPTIVE_MODE;
+  
   const [index, setIndex] = useState(0);
   const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [attemptCounter, setAttemptCounter] = useState(mode.ATTEMPTS);
-
-  // Pre-load questions
-  useEffect(() => {
-    function preloadQuestions() {
-      setQuestions(SAMPLE_QUESTIONS);
-    }
-    if (mode.PRELOAD_QUESTIONS) preloadQuestions();
-  }, []);
-
-  // Mask the questions answer key
-  useEffect(() => {
-    function maskQuestionAnswerKey() {
-      setQuestions(maskAnswerKey(SAMPLE_QUESTIONS));
-    }
-    maskQuestionAnswerKey();
-  }, []);
+  
 
   return (
-    <QuizWrapper className="quiz-wrapper">
-      {index < questions.length &&
-        <QuestionCounter>
-          QUESTION {index + 1} of {questions.length}
-        </QuestionCounter>
-      }
-      <h2>{mode.ATTEMPTS > 1 && `Remaining attempts: ${attemptCounter}`}</h2>
+    <Query query={GET_QUESTIONS}>
+      {({ loading, error, data }) => {
+        if (loading) return 'Loading...';
+        if (error) return `Error! ${error.message}`;
 
-      {index && questions && index === questions.length
-        ? <Assessment
-            score={correctCount}
-            totalPossible={questions.length}
-          />
-        : attemptCounter > 0
-            ?  <Question
-                  questionData={SAMPLE_QUESTIONS[index]}
-                  gradeResponse={gradeResponse}
-                  totalAttemptsAllowed={mode.ATTEMPTS}
-                  isFeedbackEnabled={mode.FEEDBACK}
-                  isAnswerCorrect={isSubmissionCorrect}
-                  getNextQuestion={getNextQuestion}
-                  remainingAttempts={attemptCounter}
-              />
-            : <AnswerKey
-                answerKey={SAMPLE_QUESTIONS[index]}
-                getNextQuestion={getNextQuestion}
-              />
-      }
+        const { fetchQuestions: questions } = data;
 
-    </QuizWrapper>
-  );
+        if (questions.length > 0) {
+          return (
+            <QuizWrapper className="quiz-wrapper">
+              {index < questions.length &&
+                <QuestionCounter>
+                  QUESTION {index + 1} of {questions.length}
+                </QuestionCounter>
+              }
+              <h2>{mode.ATTEMPTS > 1 && `Remaining attempts: ${attemptCounter}`}</h2>
+        
+              {index && questions && index === questions.length
+                ? <Assessment
+                    score={correctCount}
+                    totalPossible={questions.length}
+                  />
+                : attemptCounter > 0
+                    ?  <Question
+                          questionData={questions[index]}
+                          gradeResponse={gradeResponse}
+                          totalAttemptsAllowed={mode.ATTEMPTS}
+                          isFeedbackEnabled={mode.FEEDBACK}
+                          isAnswerCorrect={isSubmissionCorrect}
+                          getNextQuestion={getNextQuestion}
+                          remainingAttempts={attemptCounter}
+                      />
+                    : <Question
+                        questionData={questions[index]}
+                        gradeResponse={gradeResponse}
+                        totalAttemptsAllowed={mode.ATTEMPTS}
+                        isFeedbackEnabled={mode.FEEDBACK}
+                        isAnswerCorrect={isSubmissionCorrect}
+                        getNextQuestion={getNextQuestion}
+                        remainingAttempts={attemptCounter}
+                    />
+                  }
+            </QuizWrapper>
+          );
+        } else {
+          return (
+            <QuizWrapper>
+              <div>No questions!</div>
+            </QuizWrapper>
+          )
+        }
+      }}
+    </Query>
+  )
 
-  // Masks the answers from an array of questions
-  function maskQuestionAnswerKey(array) {
-    // Removes answer from a question object
-    let maskedQuestions = [ ...array ];
-    return maskedQuestions.choices.forEach(choice => choice.isAnswer = null);
-  }
+  // // Masks the answers from an array of questions
+  // function maskQuestionAnswerKey(array) {
+  //   // Removes answer from a question object
+  //   let maskedQuestions = [ ...array ];
+  //   return maskedQuestions.choices.forEach(choice => choice.isAnswer = null);
+  // }
 
   // REFACTOR: make this async on the server
   // Checks the validity of a choices payload from Question
   function gradeResponse(choicePayload) {
+    // console.log(JSON.stringify(choicePayload, null, 4));
     const ANSWERS = getAnswerArray();
+    // console.log(ANSWERS);
     const IS_CORRECT = objectsAreEqual(ANSWERS, choicePayload);
 
     if (IS_CORRECT) {
@@ -101,12 +115,12 @@ const Quiz = ({ mode }) => {
   }
 
   function getNextQuestion() {
-    // Gets the next question object
-    if (index < questions.length) {
+    // // Gets the next question object
+    // if (index < questions.length) {
       setIndex(index + 1); // increment the index; re-render
-    }
-    setIsSubmissionCorrect(false); // reset correct to false and re-render
-    setAttemptCounter(mode.ATTEMPTS); // reset attemptCounter
+    // }
+    // setIsSubmissionCorrect(false); // reset correct to false and re-render
+    // setAttemptCounter(mode.ATTEMPTS); // reset attemptCounter
   }
 };
 

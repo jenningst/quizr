@@ -10,13 +10,13 @@ module.exports = {
     }
   },
   Query: {
-    questions: async function() {
+    fetchQuestions: async function() {
       try {
         const questions = await Question.find({});
         if (questions.length > 0) {
-          return questions.map(q => {
+          return questions.map(question => {
             // return doc w/o metadata; replace mongo _id with the question id
-            return { ...q._doc, _id: q.id};
+            return { ...question._doc, _id: question.id};
           })
         }
         return [];

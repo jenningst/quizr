@@ -30,8 +30,8 @@ const CREATE_QUESTION = gql`
 // `;
 
 const GET_QUESTIONS = gql`
-  query questions {
-    questions {
+  query fetchQuestions {
+    fetchQuestions {
       _id
       title
       choices {

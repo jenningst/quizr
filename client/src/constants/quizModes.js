@@ -44,8 +44,8 @@ const ADAPTIVE_MODE = {
 //  if TRUE: get all question data ahead of time and run through it (preset)
 //  if FALSE: get new question after every submission
 
-export const MODES = [
+export const MODES = {
   LEARNING_MODE,
   PREP_MODE,
   ADAPTIVE_MODE,
-];
+};
