@@ -3,14 +3,12 @@ import styled from 'styled-components'
 import { Query } from 'react-apollo';
 import QuestionComposer from '../components/composer/QuestionComposer';
 import QuestionCounter from '../components/QuestionCounter';
-import { MediumButton } from '../components/common/Button';
 
-import { GET_QUESTIONS } from '../queries/question';
+import { GET_QUESTIONS } from '../queries/questionQueries';
 
 const QuestionCounterOffline = () => (
   <CounterWrapper>
-    <Title>Unable to Retrieve Data</Title>
-    <MediumButton type="button">Refresh</MediumButton>
+    <Title>You Are Offline</Title>
   </CounterWrapper>
 )
 
@@ -18,7 +16,7 @@ const ComposerContainer = () => (
   <ComposerWrapper className="composer-wrapper">
     <QuestionComposer />
     <Query query={GET_QUESTIONS}>
-      {({ loading, error, data }) => {
+      {({ loading, error, data, refetch }) => {
         if (loading) return "Loading Questions";
         if (error) return <QuestionCounterOffline />;
 
@@ -26,7 +24,7 @@ const ComposerContainer = () => (
         const { fetchQuestions: questions } = data;
 
         return (
-          <QuestionCounter count={questions.length}/>
+          <QuestionCounter data={questions} refetch={refetch}/>
         )
       }}
     </Query>

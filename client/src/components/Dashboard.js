@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
 import Home from './Home';
-import Quiz from './quiz/Quiz';
+import QuizContainer from '../containers/QuizContainer';
 import ComposerContainer from '../containers/ComposerContainer';
 
 const Dashboard = () => {
@@ -28,7 +28,7 @@ const Dashboard = () => {
         </Sidebar>
         <Main className='main'>
           <Route exact path='/' component={Home} />
-          <Route path='/take-a-quiz' component={Quiz} />
+          <Route path='/take-a-quiz' component={QuizContainer} />
           <Route path='/question-composer' component={ComposerContainer} />
         </Main>
       </PageWrapper>

@@ -5,7 +5,7 @@ import ChoiceEntry from './ChoiceEntry';
 import { BigButton } from '../common/Button';
 
 import { Mutation } from 'react-apollo';
-import { CREATE_QUESTION, GET_QUESTIONS } from '../../queries/question';
+import { CREATE_QUESTION, GET_QUESTIONS } from '../../queries/questionQueries';
 
 const QuestionComposer = () => {
   const [title, setTitle] = useState('');

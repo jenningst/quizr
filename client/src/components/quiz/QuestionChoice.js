@@ -1,11 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { BigButton } from '../common/Button';
+import { SmallButton } from '../common/Button';
 
 const QuestionChoice = ({
   index,
-  choiceText,
+  text,
   isSelected,
   toggleIsSelected
 }) => {
@@ -13,19 +13,19 @@ const QuestionChoice = ({
   return (
     <>
       {isSelected ? (
-        <HighlightedButton
+        <ActiveButton
           primary
           onClick={e => toggleIsSelected(index)}
         >
-          {choiceText}
-        </HighlightedButton>
+          {text}
+        </ActiveButton>
         ) : (
-          <LargeButton
+          <InactiveButton
             type="button"
             onClick={e => toggleIsSelected(index)}
           >
-            {choiceText}
-          </LargeButton>
+            {text}
+          </InactiveButton>
         )
       }
     </>
@@ -33,8 +33,8 @@ const QuestionChoice = ({
 };
 
 QuestionChoice.propTypes = {
-  index: PropTypes.number.isRequired,
-  choiceText: PropTypes.string.isRequired,
+  index: PropTypes.string.isRequired,
+  text: PropTypes.string.isRequired,
   isSelected: PropTypes.bool.isRequired,
   toggleIsSelected: PropTypes.func,
 };
@@ -45,17 +45,27 @@ QuestionChoice.defaultProps = {
 
 export default QuestionChoice;
 
-const LargeButton = styled(BigButton)`
+const InactiveButton = styled(SmallButton)`
+  width: 100%;
+  padding: 1em;
+  outline: none;
+
+  & + button {
+    margin-top: .50em;
+  }
+
   &:hover {
-    border: 3px solid #8B90FF;
+    background: #8B90FF;
+    color: #FCFCFC;
     font-weight: 700;
   }
 `;
 
-const HighlightedButton = styled(LargeButton)`
+const ActiveButton = styled(InactiveButton)`
   background: #8B90FF;
   font-weight: 700;
   color: #FFFFFF;
+  outline: none;
 
   &:hover {
     border: none;

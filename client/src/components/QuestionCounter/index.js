@@ -1,14 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+import { SmallButton } from '../common/Button';
 
-const QuestionCounter = ({ count }) => (
-  <CounterWrapper>
-    <Header>
-      <Title>Questions: {count}</Title>
-    </Header>
-  </CounterWrapper>
-);
+const QuestionCounter = ({ data, refetch }) => {
+  return (
+    <CounterWrapper>
+      <Header>
+        <Title>Questions: {data.length}</Title>
+        <SmallButton onClick={refetch}>Refresh</SmallButton>
+      </Header>
+      <QuestionList>
+        {data.map((q) => (
+          <QuestionItem key={q._id}>{q.title.slice(0, 50)}</QuestionItem>
+        ))}
+      </QuestionList>
+    </CounterWrapper>
+  );
+}
 
 QuestionCounter.propTypes = {
   count: PropTypes.number.isRequired,
@@ -23,7 +32,7 @@ const CounterWrapper = styled.div`
   grid-template-areas: 
     "header"
     "list";
-  grid-gap: 2em;
+  grid-gap: .50em;
   width: auto;
   height: 100%;
 
@@ -38,6 +47,30 @@ const Header = styled.header`
   display: flex;
   justify-content: center;
   align-items: center;
+`;
+
+const QuestionList = styled.section`
+  grid-area: list;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
+`;
+
+const QuestionItem = styled.div`
+  box-sizing: border-box;
+  width: 100%;
+  font-family: 'Montserrat', sans-serif;
+  color: #333333;
+  font-size: .70em;
+
+  padding: 1em;
+  background: red;
+  border-radius: 2px;
+
+  & + div {
+    margin-top: .50em;
+  }
 `;
 
 const Title = styled.h1`

@@ -1,138 +1,147 @@
 import React, { useState } from 'react';
-import Question from './Question';
-import Assessment from './Assessment';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { SAMPLE_QUESTIONS } from '../../constants/sampleQuestions';
-import { MODES } from '../../constants/quizModes';
 
-import { Query } from 'react-apollo';
-import { GET_QUESTIONS } from '../../queries/question';
+import Assessment from './Assessment';
+import Question from './Question';
 
-import { objectsAreEqual } from '../../utilities/helpers';
+import { arraysAreEqual } from '../../utilities/helpers.js'
 
-const Quiz = () => {
-  const mode = MODES.ADAPTIVE_MODE;
-  
+const Quiz = ({ mode, questionSet, answerKey }) => {
   const [index, setIndex] = useState(0);
   const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [attemptCounter, setAttemptCounter] = useState(mode.ATTEMPTS);
-  
+
+  const { ATTEMPTS, FEEDBACK, REPORT } = mode;
 
   return (
-    <Query query={GET_QUESTIONS}>
-      {({ loading, error, data }) => {
-        if (loading) return 'Loading...';
-        if (error) return `Error! ${error.message}`;
+    <QuizWrapper className="quiz-wrapper">
+      <QuizHeader>
+        <HeaderContent>QUESTION {index + 1} of {questionSet.length}</HeaderContent>
+        <HeaderContent>{ATTEMPTS > 1 && `ATTEMPTS REMAINING: ${attemptCounter}`}</HeaderContent>
+      </QuizHeader>
 
-        const { fetchQuestions: questions } = data;
-
-        if (questions.length > 0) {
-          return (
-            <QuizWrapper className="quiz-wrapper">
-              {index < questions.length &&
-                <QuestionCounter>
-                  QUESTION {index + 1} of {questions.length}
-                </QuestionCounter>
-              }
-              <h2>{mode.ATTEMPTS > 1 && `Remaining attempts: ${attemptCounter}`}</h2>
-        
-              {index && questions && index === questions.length
-                ? <Assessment
-                    score={correctCount}
-                    totalPossible={questions.length}
-                  />
-                : attemptCounter > 0
-                    ?  <Question
-                          questionData={questions[index]}
-                          gradeResponse={gradeResponse}
-                          totalAttemptsAllowed={mode.ATTEMPTS}
-                          isFeedbackEnabled={mode.FEEDBACK}
-                          isAnswerCorrect={isSubmissionCorrect}
-                          getNextQuestion={getNextQuestion}
-                          remainingAttempts={attemptCounter}
-                      />
-                    : <Question
-                        questionData={questions[index]}
-                        gradeResponse={gradeResponse}
-                        totalAttemptsAllowed={mode.ATTEMPTS}
-                        isFeedbackEnabled={mode.FEEDBACK}
-                        isAnswerCorrect={isSubmissionCorrect}
-                        getNextQuestion={getNextQuestion}
-                        remainingAttempts={attemptCounter}
-                    />
-                  }
-            </QuizWrapper>
-          );
-        } else {
-          return (
-            <QuizWrapper>
-              <div>No questions!</div>
-            </QuizWrapper>
-          )
+      <QuizMain>
+        {index && questionSet && index === questionSet.length
+          ? <Assessment
+              score={correctCount}
+              totalPossible={questionSet.length}
+            />
+          : attemptCounter > 0
+            ? <Question
+                question={questionSet[index]}
+                gradeResponse={gradeResponse}
+                isFeedbackEnabled={FEEDBACK}
+                totalAttemptsAllowed={ATTEMPTS}
+                remainingAttempts={attemptCounter}
+                isAnswerCorrect={isSubmissionCorrect}
+                fetchNextQuestion={incrementQuestionIndex}
+              />
+            : <Question
+                question={questionSet[index]}
+                gradeResponse={gradeResponse}
+                isFeedbackEnabled={FEEDBACK}
+                totalAttemptsAllowed={ATTEMPTS}
+                remainingAttempts={attemptCounter}
+                isAnswerCorrect={isSubmissionCorrect}
+                fetchNextQuestion={incrementQuestionIndex}
+            />
         }
-      }}
-    </Query>
-  )
+      </QuizMain>
 
-  // // Masks the answers from an array of questions
-  // function maskQuestionAnswerKey(array) {
-  //   // Removes answer from a question object
-  //   let maskedQuestions = [ ...array ];
-  //   return maskedQuestions.choices.forEach(choice => choice.isAnswer = null);
-  // }
+    </QuizWrapper>
+  );
 
-  // REFACTOR: make this async on the server
-  // Checks the validity of a choices payload from Question
+  /**
+   * Increments the question index to retrieve the next question in a set.
+   */
+  function incrementQuestionIndex() {
+    if (index < questionSet.length) { // make sure we don't "over-increment"
+      setIndex(index + 1);
+    }
+    setIsSubmissionCorrect(false); // reset correct to false
+    setAttemptCounter(ATTEMPTS); // reset number of attempts
+  }
+
+  /**
+   * Grades a question submission.
+   */
   function gradeResponse(choicePayload) {
-    // console.log(JSON.stringify(choicePayload, null, 4));
-    const ANSWERS = getAnswerArray();
-    // console.log(ANSWERS);
-    const IS_CORRECT = objectsAreEqual(ANSWERS, choicePayload);
+    const currentQuestionId = questionSet[index]._id;
+    const IS_SUBMISSION_CORRECT = arraysAreEqual(
+      answerKey[currentQuestionId].answers, choicePayload
+    );
 
-    if (IS_CORRECT) {
-      if (mode.REPORT !== "NONE") setCorrectCount(correctCount + 1);
-      if (mode.FEEDBACK) { 
+    if (IS_SUBMISSION_CORRECT) {
+      if (REPORT !== "NONE") { // no end-of-quiz report generated
+        setCorrectCount(correctCount + 1);
+      }
+      if (FEEDBACK) { // immediate feedback is needed
         setIsSubmissionCorrect(true);
       } else {
-        getNextQuestion();
+        incrementQuestionIndex();
       }
-    } else {
-      if (mode.ATTEMPTS) setAttemptCounter(attemptCounter - 1);
-      if (mode.FEEDBACK) setIsSubmissionCorrect(false);
+    } else { // incorrect submission
+      if (ATTEMPTS) setAttemptCounter(attemptCounter - 1);
+      if (FEEDBACK) setIsSubmissionCorrect(false);
     }
   }
-
-  function getAnswerArray() {
-    // Helper method; Returns an array of correct choice indexes
-    let answerIndexes = [];
-    SAMPLE_QUESTIONS[index].choices.forEach((choice, index) => {
-      if (choice.isAnswer === true) {
-        answerIndexes.push(index);
-      }
-    });
-    return answerIndexes;
-  }
-
-  function getNextQuestion() {
-    // // Gets the next question object
-    // if (index < questions.length) {
-      setIndex(index + 1); // increment the index; re-render
-    // }
-    // setIsSubmissionCorrect(false); // reset correct to false and re-render
-    // setAttemptCounter(mode.ATTEMPTS); // reset attemptCounter
-  }
 };
+
+Quiz.propTypes = {
+  mode: PropTypes.shape({
+    ATTEMPTS: PropTypes.number.isRequired,
+    FEEDBACK: PropTypes.bool.isRequired,
+    REPORT: PropTypes.string.isRequired,
+    TIMER: PropTypes.string.isRequired,
+    PRELOAD_QUESTIONS: PropTypes.bool.isRequired,
+  }).isRequired,
+  questionSet: PropTypes.arrayOf(
+    PropTypes.PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      choices: PropTypes.array.isRequired,
+    })
+  ),
+}
 
 export default Quiz;
 
 const QuizWrapper = styled.div`
-  color: #8B90FF;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: 3em 1fr;
+  grid-template-areas:
+    "header"
+    "main";
+  grid-row-gap: .50em;
+
+  padding: 1em;
+  background: #edeff7;
+  border-radius: 5px;
 `;
 
-const QuestionCounter = styled.h3`
+
+const QuizHeader = styled.header`
+  box-sizing: border-box;
+  grid-area: header;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+  align-items: center;
+
+  padding-left: 1em;
+  padding-right: 1em;
+  background: #FFFFFF;
+`;
+
+const HeaderContent = styled.h1`
   font-family: 'Montserrat', sans-serif;
-  font-size: 1em;
-  width: 100%;
-  text-align: center;
+  font-size: .90em;
+`;
+
+const QuizMain = styled.section`
+  box-sizing: border-box;
+  grid-area: main;
 `;
