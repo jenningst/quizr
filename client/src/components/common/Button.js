@@ -1,23 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import ButtonBase from './base/ButtonBase';
+import styled from 'styled-components';
 
-const Button = ({ onClick, type, children }) => (
-  <ButtonBase
-    type={type}
-    onClick={onClick}
-  >
-    {children}
-  </ButtonBase>
-);
+export const BigButton = styled.button`
+  text-transform: uppercase;
+  letter-spacing: .10em;
+  font-size: .90em;
+  font-family: 'Montserrat', sans-serif;
+  padding: 1em;
+  border-radius: 2px;
+  border: none;
+`;
 
-Button.propTypes = {
-  onClick: PropTypes.func.isRequired,
-  type: PropTypes.string,
-};
+export const MediumButton = styled.button`
+  text-transform: uppercase;
+  letter-spacing: .10em;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  padding: .8em;
+  border-radius: 2px;
+  border: none;
+`;
 
-Button.defaultProps = {
-  type: "button",
-};
+export const SmallButton = styled.button`
+  text-transform: lowercase;
+  font-size: .7em;
+  font-family: 'Montserrat', sans-serif;
+  padding: .50em
+  border-radius: 2px;
+  border: none;
+`;
 
-export default Button;
+export default { BigButton, MediumButton, SmallButton };

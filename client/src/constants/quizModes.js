@@ -3,7 +3,7 @@ const LEARNING_MODE = {
   FEEDBACK: true,
   REPORT: "NONE",
   TIMER: "NONE",
-  "PRELOAD_QUESTIONS": true,
+  PRELOAD_QUESTIONS: true,
 };
 
 const PREP_MODE = {
@@ -11,7 +11,7 @@ const PREP_MODE = {
   FEEDBACK: true,
   REPORT: "QUESTION",
   TIMER: "QUESTION",
-  "PRELOAD_QUESTIONS": true,
+  PRELOAD_QUESTIONS: true,
 };
 
 const ADAPTIVE_MODE = {
@@ -19,7 +19,7 @@ const ADAPTIVE_MODE = {
   FEEDBACK: false,
   REPORT: "SET",
   TIMER: "SET",
-  "PRELOAD_QUESTIONS": false,
+  PRELOAD_QUESTIONS: false,
 };
 
 // RETRIES (BOOL): 

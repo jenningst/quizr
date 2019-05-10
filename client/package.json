@@ -1,11 +1,20 @@
 {
-  "name": "quizr",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "apollo-boost": "^0.3.1",
+    "eslint-plugin-react-hooks": "^1.6.0",
+    "graphql": "^14.3.0",
+    "npm": "^6.9.0",
     "react": "^16.8.6",
+    "react-apollo": "^2.5.2",
+    "react-apollo-hooks": "^0.4.3",
     "react-dom": "^16.8.6",
+    "react-redux": "^7.0.3",
+    "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
+    "redux": "^4.0.1",
     "shortid": "^2.2.14",
     "styled-components": "^4.2.0"
   },
@@ -13,15 +22,31 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "prettier-watch": "onchange '**/*.js' -- prettier --write {{changed}}"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "plugin:prettier/recommended",
+      "react-app"
+    ],
+    "plugins": [
+      "react-hooks"
+    ],
+    "rules": {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
+    }
   },
   "browserslist": [
     ">0.2%",
     "not dead",
     "not ie <= 11",
     "not op_mini all"
-  ]
+  ],
+  "devDependencies": {
+    "eslint-config-prettier": "^4.2.0",
+    "eslint-plugin-prettier": "^3.0.1"
+  },
+  "proxy": "http://localhost:3001"
 }
