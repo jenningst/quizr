@@ -4,6 +4,7 @@ const LEARNING_MODE = {
   REPORT: "NONE",
   TIMER: "NONE",
   PRELOAD_QUESTIONS: true,
+  DISPLAY_NAME: "Learning"
 };
 
 const PREP_MODE = {
@@ -12,6 +13,7 @@ const PREP_MODE = {
   REPORT: "QUESTION",
   TIMER: "QUESTION",
   PRELOAD_QUESTIONS: true,
+  DISPLAY_NAME: "Prep"
 };
 
 const ADAPTIVE_MODE = {
@@ -20,6 +22,7 @@ const ADAPTIVE_MODE = {
   REPORT: "SET",
   TIMER: "SET",
   PRELOAD_QUESTIONS: false,
+  DISPLAY_NAME: "Adaptive"
 };
 
 // RETRIES (BOOL): 
@@ -44,8 +47,8 @@ const ADAPTIVE_MODE = {
 //  if TRUE: get all question data ahead of time and run through it (preset)
 //  if FALSE: get new question after every submission
 
-export const MODES = {
+export const MODES = [
   LEARNING_MODE,
   PREP_MODE,
   ADAPTIVE_MODE,
-};
+];

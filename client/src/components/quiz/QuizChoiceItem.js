@@ -3,52 +3,45 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { SmallButton } from '../common/Button';
 
-const QuestionChoice = ({
-  index,
-  text,
-  isSelected,
-  toggleIsSelected
-}) => {
-  
-  return (
-    <>
-      {isSelected ? (
-        <ActiveButton
-          primary
-          onClick={e => toggleIsSelected(index)}
+const QuizChoiceItem = ({ index, text, isSelected, toggleIsSelected }) => (
+  <>
+    {isSelected ? (
+      <ActiveButton
+        primary
+        onClick={() => toggleIsSelected(index)}
+      >
+        {text}
+      </ActiveButton>
+      ) : (
+        <InactiveButton
+          type="button"
+          onClick={() => toggleIsSelected(index)}
         >
           {text}
-        </ActiveButton>
-        ) : (
-          <InactiveButton
-            type="button"
-            onClick={e => toggleIsSelected(index)}
-          >
-            {text}
-          </InactiveButton>
-        )
-      }
-    </>
-  );
-};
+        </InactiveButton>
+      )
+    }
+  </>
+);
 
-QuestionChoice.propTypes = {
+QuizChoiceItem.propTypes = {
   index: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   isSelected: PropTypes.bool.isRequired,
   toggleIsSelected: PropTypes.func,
 };
 
-QuestionChoice.defaultProps = {
+QuizChoiceItem.defaultProps = {
   toggleIsSelected: null,
 }
 
-export default QuestionChoice;
+export default QuizChoiceItem;
 
 const InactiveButton = styled(SmallButton)`
   width: 100%;
   padding: 1em;
   outline: none;
+  text-align: left;
 
   & + button {
     margin-top: .50em;

@@ -2,18 +2,19 @@ import React from 'react';
 import styled from 'styled-components';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 
-import Home from './Home';
-import QuizContainer from '../containers/QuizContainer';
-import ComposerContainer from '../containers/ComposerContainer';
+import Home from '../Home'
+import QuizContainer from '../../containers/QuizContainer';
+import ComposerContainer from '../../containers/ComposerContainer';
 
 const Dashboard = () => {
   return (
     <Router>
       <PageWrapper>
-        <Topbar className='topbar' />
+        <Topbar className='topbar'>Topbar content</Topbar>
         <Sidebar className='sidebar'>
           {
             <>
+              <Logo />
               <SidbarNavItem>
                 <Link to='/'>Home</Link>
               </SidbarNavItem>
@@ -41,16 +42,26 @@ export default Dashboard;
 const PageWrapper = styled.div`
   display: grid;
   grid-template-columns: 4em 1fr;
-  grid-template-rows: 3em 1fr;
+  grid-template-rows: 4em 1fr;
   grid-template-areas:
-    'logo topbar'
+    'sidebar topbar'
     'sidebar main';
   height: 100vh;
 `;
 
 const Sidebar = styled.section`
   grid-area: sidebar;
-  background: #61437A;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: flex-start;
+  align-items: center;
+
+  background: #FFFFFF;
+  box-shadow: 7px 3px 17px 0px rgba(227,225,234,1);
+`;
+
+const Logo = styled.div`
+  height: 4em;
 `;
 
 const SidbarNavItem = styled.div`
@@ -62,10 +73,10 @@ const SidbarNavItem = styled.div`
 
 const Topbar = styled.section`
   grid-area: topbar;
-  background: #9A93C4;
+  background: #FFFFFF;
 `;
 
 const Main = styled.section`
+  box-sizing: border-box;
   grid-area: main;
-  background: #FFFFFF;
 `;

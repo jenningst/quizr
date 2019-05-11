@@ -39,7 +39,7 @@ const CounterWrapper = styled.div`
   padding: 1em;
 
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: 8px;
 `;
 
 const Header = styled.header`

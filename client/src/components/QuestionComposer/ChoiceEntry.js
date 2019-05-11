@@ -1,34 +1,27 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import Form from '../common/Form';
-import ChoiceItem from './ChoiceItem';
 import styled from 'styled-components';
+
+import ChoiceItem from './ChoiceItem';
 import { SmallButton } from '../common/Button';
 
-const ChoiceEntry = ({
-  choiceCache,
-  toggleIsAnswer,
-  addChoice, 
-  updateChoice,
-  deleteChoice
-}) => {
-  // Local state for handling input changes and markdown toggle
+const ChoiceEntry = ({ choiceCache, toggleIsAnswer, addChoice, updateChoice, deleteChoice }) => {
   const [choiceText, setChoiceText] = useState("");
 
   return (
       <ChoiceComposerWrapper className="choice-entry-wrapper">
         <FormWrapper className="form-wrapper">
-          <Form onSubmit={addNewChoice}>
-            <InputWrapper className="form-input-wrapper">
+          <form onSubmit={addNewChoice}>
+            <InputWrapper>
               <ChoiceInput 
                 name="choice-text"
                 value={choiceText}
-                onChange={handleInputChange}
+                onChange={(e)=> setChoiceText(e.target.value)}
                 placeholder="Start typing a choice ..."
               />
               <EmbeddedButton type="submit">Add</EmbeddedButton>
             </InputWrapper>
-          </Form>
+          </form>
         </FormWrapper>
         <ChoiceList>
           {choiceCache &&
@@ -51,16 +44,16 @@ const ChoiceEntry = ({
       </ChoiceComposerWrapper>
   );
 
-  // Handles changes for input fields
-  function handleInputChange(e) {
-    setChoiceText(e.target.value);
-  }
+  // // Handles changes for input fields
+  // function handleInputChange(e) {
+  //   setChoiceText(e.target.value);
+  // }
 
   // Adds a new choice
   function addNewChoice(e) {
-    e.preventDefault();
     addChoice(choiceText);
     setChoiceText("");
+    e.preventDefault();
   }
 };
 
