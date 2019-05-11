@@ -39,6 +39,6 @@ export default Icon;
 
 const StyledIcon = styled.svg`
   transition: fill 0.25s;
-  width: 2em;
-  height: 2em;
+  width: 1.5em;
+  height: 1.5em;
 `;
