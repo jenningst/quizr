@@ -1,9 +1,10 @@
 import React from 'react';
 import styled from 'styled-components'
-import { Query } from 'react-apollo';
-import QuestionComposer from '../components/composer/QuestionComposer';
+
+import QuestionComposer from '../components/QuestionComposer/index';
 import QuestionCounter from '../components/QuestionCounter';
 
+import { Query } from 'react-apollo';
 import { GET_QUESTIONS } from '../queries/questionQueries';
 
 const QuestionCounterOffline = () => (
@@ -43,8 +44,7 @@ const ComposerWrapper = styled.div`
   height: 100%;
 
   padding: 1em;
-
-  background: #edeff7;
+  background: #EFF3FB;
 
   @media (max-width: 1024px) {
     display: grid;
@@ -66,7 +66,7 @@ const CounterWrapper = styled.div`
   padding: 1em;
 
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: 8px;
 `;
 
 const Title = styled.h1`

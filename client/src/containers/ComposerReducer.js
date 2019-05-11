@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import QuestionComposer from '../components/composer/QuestionComposer';
+import QuestionComposer from '../components/QuestionComposer/index';
 import {
   setStep,
   setMaxStepAllowed,

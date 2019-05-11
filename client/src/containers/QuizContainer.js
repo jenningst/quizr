@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import { Query } from 'react-apollo';
 import { GET_QUESTIONS } from '../queries/questionQueries';
 
-import ModeSelection from '../components/quiz/ModeSelection';
-import Quiz from '../components/quiz/Quiz';
+import ModeSelection from '../components/Quiz/ModeSelection';
+import Quiz from '../components/Quiz';
 
 import { MODES } from '../constants/quizModes';
 
@@ -63,4 +63,6 @@ const QuizWrapper = styled.div`
   box-sizing: border-box;
   display: grid;
   height: 100%;
+
+  background: #EFF3FB;
 `;

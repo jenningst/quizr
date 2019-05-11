@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import ChoiceEntry from './ChoiceEntry';
+
 import { BigButton } from '../common/Button';
 
 import { Mutation } from 'react-apollo';
@@ -173,7 +175,7 @@ const ComposeQuestionWrapper = styled.div`
   padding: 1em;
 
   background: #FFFFFF;
-  border-radius: 5px;
+  border-radius: 8px;
 `;
 
 const Header = styled.header`

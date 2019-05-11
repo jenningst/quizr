@@ -1,11 +1,18 @@
 import React from 'react';
+import styled from 'styled-components';
 
 const Home = () => {
   return (
-    <div>
-      <h1>Home</h1>
-    </div>
+    <HomeWrapper>
+      Home
+    </HomeWrapper>
   );
 };
 
 export default Home;
+
+const HomeWrapper = styled.div`
+  box-sizing: border-box;
+  background: #EFF3FB;
+  height: 100%;
+`;
