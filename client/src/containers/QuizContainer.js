@@ -11,24 +11,11 @@ import { MODES } from '../constants/quizModes';
 /* ** DATA & RENDER LOGIC ONLY ** */
 
 const QuizContainer = () => {
-  // const [questionSet, setQuestionSet] = useState([]);
-  // const [key, setKey] = useState([]);
-
-  // // generate the answer key for grading responses
-  // useEffect(() => {
-  //   if (questionSet.length > 0) {
-  //     // existing answerKey, concat the new and the old together and increase
-  //     const newQuestionSet = generateAnswerKeyFromQuestions(questionSet);
-  //     setKey([...questionSet, newQuestionSet]);
-  //   }
-  //   setKey(generateAnswerKeyFromQuestions(questionSet));
-  //   console.log(questionSet);
-  // }, [questionSet]);
-
   return (
     <QuizWrapper>
       <Query query={GET_QUESTIONS}>
         {({ loading, error, data }) => {
+
           // fall-back UI
           if (loading) return "Loading Questions";
           if (error) return `Error loading questions: ${error.message}`;
@@ -50,25 +37,43 @@ const QuizContainer = () => {
   );
   
   /**
-   * Creates an object to hold the answer key and all quiz choices. Used to 
-   * grade individual questions or an entire question set.
+   * generateAnswerKeyFromQuestions: Creates an object to hold the answer key 
+   * and all quiz choices. Used to grade individual questions or an entire 
+   * question set.
    */
   function generateAnswerKeyFromQuestions(questionArray) {
     let answerKey = {};
+    // let maskedSet = [];
 
     // for each question, get id of each choice that is an answer
     for (let i = 0; i < questionArray.length; i++) {
-      let newObj = {};
-      newObj.answers = 
+      let answerKeyObject = {};
+      // let maskedObject = { ...questionArray[index] };
+
+      answerKeyObject.answers =
       questionArray[i].choices
           .filter(choice => choice.isAnswer === true)
           .map(answers => answers._id);
-      newObj.choices = [];
-      newObj.status = 'unanswered';
-      // add the question's data to a new object
-      answerKey[questionArray[i]._id] = newObj;
+
+      answerKeyObject.choices = [];
+      answerKeyObject.status = 'unanswered';
+
+      // add the question's answer key
+      answerKey[questionArray[i]._id] = answerKeyObject;
+      // // add the question's question
+      // maskedSet.push(maskedObject);
     }
     return answerKey
+  }
+
+  /**
+   * maskQuestionSet(questionArray)
+   */
+  function maskQuestionSet(questionArray) {
+    let cleansedQuestionSet = [];
+    // for each question, scrub the choice.isAnswer property
+    // loop through each question
+    // 
   }
 };
 

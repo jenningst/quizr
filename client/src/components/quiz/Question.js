@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
+
 import { BigButton } from '../common/Button';
-import QuestionChoice from './QuestionChoice';
+import QuizChoiceItem from './QuizChoiceItem';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
-// const NO_CHOICE_MADE = "You need to select at least 1 choice."
+const RAN_OUT_OF_ATTEMPTS = "You ran out of attempts. Here was the correct answer";
 
 const Question = ({ 
   question,
@@ -16,20 +17,26 @@ const Question = ({
   isFeedbackEnabled,
   isAnswerCorrect,
   fetchNextQuestion,
+  answerKey
 }) => {
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
   const [shouldDisplayMessage, setShouldDisplayMessage] = useState(true);
-  const allowSubmit = selectedChoices.length > 0;
+  const allowSubmit = selectedChoices.length > 0 || answerKey.length > 0;
 
   // Renders error message and clear inputs if question was answered wrong
   useEffect(() => {
-    function renderMessage() { setMessage(ERROR_MESSAGE) };
+    function renderMessage() { 
+      setMessage(ERROR_MESSAGE)
+    };
     // if remaining attempts === totalAttemptsAllowed, questionData is being rendered for the 
     // first time; if on 1 + Nth attempt, allow rendering of a message to user
     if (remainingAttempts !== totalAttemptsAllowed && isFeedbackEnabled) { 
       renderMessage();
     };
+    if (remainingAttempts === 0 && isFeedbackEnabled) {
+      setMessage(RAN_OUT_OF_ATTEMPTS);
+    }
     setSelectedChoices([]);
   }, [remainingAttempts]);
 
@@ -43,34 +50,48 @@ const Question = ({
 
   return (
     <QuestionWrapper className="question-wrapper">
+
       <QuestionBody>
         <Title>{question.title}</Title>
-        <ChoiceBank className="choice-bank">
-          {question.choices.map((choice) => (
-            <QuestionChoice
-              key={choice._id}
-              index={choice._id}
-              text={choice.text}
-              isSelected={selectedChoices.includes(choice._id) ? true : false}
-              toggleIsSelected={selectChoice}
-            />
-          ))}
-        </ChoiceBank>
-
+        {remainingAttempts === 0
+          ? (
+            <ChoiceBank className="choice-bank">
+              {question.choices.map((choice) => (
+                <QuizChoiceItem
+                  key={choice._id}
+                  index={choice._id}
+                  text={choice.text}
+                  isSelected={answerKey.includes(choice._id) ? true : false}
+                />
+              ))}
+            </ChoiceBank>
+          ) : (
+            <ChoiceBank className="choice-bank">
+              {question.choices.map((choice) => (
+                <QuizChoiceItem
+                  key={choice._id}
+                  index={choice._id}
+                  text={choice.text}
+                  isSelected={selectedChoices.includes(choice._id) ? true : false}
+                  toggleIsSelected={selectChoice}
+                />
+              ))}
+            </ChoiceBank>
+        )}
       </QuestionBody>
-      <QuestionFooter className="action-buttons">
+
+      <QuestionFooter className="question-footer">
+        <Message>{shouldDisplayMessage ? message : null}</Message>
         {renderButton()}
-        <MessageBox className="message-box">
-          {shouldDisplayMessage ? message : null}
-        </MessageBox>
       </QuestionFooter>
+
     </QuestionWrapper>
   );
 
   // Renders a button based on state
   function renderButton() {
     if (allowSubmit) {
-      if (isAnswerCorrect) {
+      if (isAnswerCorrect || remainingAttempts === 0) {
         return (
           <ActionButtonHighlighted 
             type="button" 
@@ -105,7 +126,7 @@ const Question = ({
     if (isFeedbackEnabled) {
       // allow user to see feedback message
       gradeResponse(selectedChoices);
-      setShouldDisplayMessage(0); 
+      setShouldDisplayMessage(true); 
     } else {
       // grade response and immediately get next question (i.e. skip feedback)
       gradeResponse(selectedChoices);
@@ -145,7 +166,8 @@ Question.propTypes = {
     title: PropTypes.string.isRequired,
     choices: PropTypes.array.isRequired,
   }).isRequired,
-  gradeResponse: PropTypes.func.isRequired,
+  answerKey: PropTypes.array,
+  gradeResponse: PropTypes.func,
   totalAttemptsAllowed: PropTypes.number.isRequired,
   isFeedbackEnabled: PropTypes.bool.isRequired,
   isAnswerCorrect: PropTypes.bool.isRequired,
@@ -153,12 +175,17 @@ Question.propTypes = {
   remainingAttempts: PropTypes.number.isRequired,
 };
 
+Question.defaultProps = {
+  answerKey: [],
+  gradeResponse: null,
+};
+
 export default Question;
 
 const QuestionWrapper = styled.div`
   box-sizing: border-box;
   display: grid;
-  grid-template-rows: 1fr 3em;
+  grid-template-rows: 1fr 5em;
   grid-template-areas:
     "main"
     "footer";
@@ -189,8 +216,8 @@ const QuestionFooter = styled.div`
   grid-area: footer;
   display: flex;
   flex-flow: column nowrap;
-  justify-content: center;
-  align-items: center;  
+  justify-content: space-between;
+  align-items: center;
 `;
 
 const ActionButton = styled(BigButton)`
@@ -198,7 +225,7 @@ const ActionButton = styled(BigButton)`
   outline: none;
 
   &:hover {
-    border: 2px solid #FFE6E6;
+    border: none;
   }
 `;
 
@@ -214,10 +241,11 @@ const ActionButtonHighlighted = styled(ActionButton)`
   }
 `;
 
-const MessageBox = styled.section`
+const Message = styled.section`
   display: flex;
   flex-flow: column nowrap;
   justify-content: center;
-  align-items: center;  
-  height: 5em;
+  align-items: center;
+  font-family: 'Montserrat', sans-serif;
+  font-size: .70em;
 `;

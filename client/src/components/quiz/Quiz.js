@@ -18,8 +18,13 @@ const Quiz = ({ mode, questionSet, answerKey }) => {
   return (
     <QuizWrapper className="quiz-wrapper">
       <QuizHeader>
-        <HeaderContent>QUESTION {index + 1} of {questionSet.length}</HeaderContent>
-        <HeaderContent>{ATTEMPTS > 1 && `ATTEMPTS REMAINING: ${attemptCounter}`}</HeaderContent>
+        {}
+        <HeaderContent>
+          QUESTION {index + 1} of {questionSet.length}
+        </HeaderContent>
+        <HeaderContent>
+          {ATTEMPTS > 1 && `ATTEMPTS REMAINING: ${attemptCounter}`}
+        </HeaderContent>
       </QuizHeader>
 
       <QuizMain>
@@ -38,18 +43,18 @@ const Quiz = ({ mode, questionSet, answerKey }) => {
                 isAnswerCorrect={isSubmissionCorrect}
                 fetchNextQuestion={incrementQuestionIndex}
               />
-            : <Question
+            : 
+              <Question
                 question={questionSet[index]}
-                gradeResponse={gradeResponse}
+                answerKey={answerKey[questionSet[index]._id].answers}
                 isFeedbackEnabled={FEEDBACK}
                 totalAttemptsAllowed={ATTEMPTS}
                 remainingAttempts={attemptCounter}
                 isAnswerCorrect={isSubmissionCorrect}
                 fetchNextQuestion={incrementQuestionIndex}
-            />
+              />
         }
       </QuizMain>
-
     </QuizWrapper>
   );
 

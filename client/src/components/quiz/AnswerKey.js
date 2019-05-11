@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { BigButton, MediumButton, SmallButton } from './common/base/ButtonBase';
-import QuestionChoice from './QuestionChoice';
+import QuestionChoice from './QuizChoiceItem';
 
 const MESSAGE_TEXT = 'Your answer was incorrect. Here were the correct choices.'
 
