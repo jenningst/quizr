@@ -5,6 +5,9 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Home from '../Home'
 import QuizContainer from '../../containers/QuizContainer';
 import ComposerContainer from '../../containers/ComposerContainer';
+import Icon from '../common/Icon';
+
+import ICONS from '../../constants/icons.js';
 
 const Dashboard = () => {
   return (
@@ -16,13 +19,19 @@ const Dashboard = () => {
             <>
               <Logo />
               <SidbarNavItem>
-                <Link to='/'>Home</Link>
+                <Link to='/'>
+                  <Icon imageData={ICONS.HOME} />
+                </Link>
               </SidbarNavItem>
               <SidbarNavItem>
-                <Link to='/take-a-quiz'>Quiz</Link>
+                <Link to='/take-a-quiz'>
+                  <Icon imageData={ICONS.LIST} />
+                </Link>
               </SidbarNavItem>
               <SidbarNavItem>
-                <Link to='/question-composer'>Composer</Link>
+                <Link to='/question-composer'>
+                  <Icon imageData={ICONS.EDIT} />
+                </Link>
               </SidbarNavItem>
             </>
           }
@@ -65,10 +74,20 @@ const Logo = styled.div`
 `;
 
 const SidbarNavItem = styled.div`
-  width: 100%;
-  height: 4em;
-  border: 1px solid #FFFFFF;
-  text-align: center;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  padding: 1em;
+
+  & + div {
+    margin-top: 1em;
+  }
+
+  & :hover > svg {
+    fill: #1D56F6;
+    stroke-width: 2em;
+  }
 `;
 
 const Topbar = styled.section`

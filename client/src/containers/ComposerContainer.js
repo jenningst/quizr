@@ -40,10 +40,10 @@ const ComposerWrapper = styled.div`
   grid-template-columns: 1fr 30%;
   grid-template-areas: 
     "main aside";
-  grid-gap: 1em;
+  grid-gap: 2em;
   height: 100%;
 
-  padding: 1em;
+  padding: 2em;
   background: #EFF3FB;
 
   @media (max-width: 1024px) {

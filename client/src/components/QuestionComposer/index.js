@@ -189,6 +189,7 @@ const Title = styled.h1`
   font-family: 'Montserrat', sans-serif;
   color: #333333;
   font-size: 1.25em;
+  font-weight: 600;
   text-align: center;
 `;
 

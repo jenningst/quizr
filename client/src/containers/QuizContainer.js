@@ -15,7 +15,7 @@ const QuizContainer = () => {
   const [mode, setMode] = useState(null);
 
   return (
-    <QuizWrapper>
+    <QuizWrapper className="quiz-wrapper">
       {!mode
         ? <ModeSelection modes={MODES} setQuizMode={setQuizMode} />
         : <Query query={GET_QUESTIONS}>
@@ -64,5 +64,6 @@ const QuizWrapper = styled.div`
   display: grid;
   height: 100%;
 
+  padding: 2em;
   background: #EFF3FB;
 `;
