@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Query } from 'react-apollo';
 import { GET_QUESTIONS } from '../queries/questionQueries';
 
+import ModeSelection from '../components/quiz/ModeSelection';
 import Quiz from '../components/quiz/Quiz';
 
 import { MODES } from '../constants/quizModes';
@@ -11,69 +12,48 @@ import { MODES } from '../constants/quizModes';
 /* ** DATA & RENDER LOGIC ONLY ** */
 
 const QuizContainer = () => {
+  const [mode, setMode] = useState(null);
+
   return (
     <QuizWrapper>
-      <Query query={GET_QUESTIONS}>
-        {({ loading, error, data }) => {
+      {!mode
+        ? <ModeSelection modes={MODES} setQuizMode={setQuizMode} />
+        : <Query query={GET_QUESTIONS}>
+            {({ loading, error, data }) => {
 
-          // fall-back UI
-          if (loading) return "Loading Questions";
-          if (error) return `Error loading questions: ${error.message}`;
+              // fall-back UI
+              if (loading) return "Loading Questions";
+              if (error) return `Error loading questions: ${error.message}`;
 
-          // destructure our fetched questions
-          const { fetchQuestions: questions } = data;
+              // destructure our fetched questions
+              const { fetchQuestions: questions } = data;
 
-          // render quiz
-          return (
-            <Quiz
-              mode={MODES.LEARNING_MODE}
-              questionSet={questions}
-              answerKey={generateAnswerKeyFromQuestions(questions)}
-            />
-          );
-        }}
-      </Query>
+              // render quiz
+              return (
+                <Quiz
+                  mode={mode}
+                  questionSet={questions}
+                  resetQuiz={resetQuiz}
+                />
+              );
+            }}
+          </Query>
+      }
     </QuizWrapper>
   );
-  
+
   /**
-   * generateAnswerKeyFromQuestions: Creates an object to hold the answer key 
-   * and all quiz choices. Used to grade individual questions or an entire 
-   * question set.
+   * setQuizMode: Establishes the quiz mode for the current quiz.
    */
-  function generateAnswerKeyFromQuestions(questionArray) {
-    let answerKey = {};
-    // let maskedSet = [];
-
-    // for each question, get id of each choice that is an answer
-    for (let i = 0; i < questionArray.length; i++) {
-      let answerKeyObject = {};
-      // let maskedObject = { ...questionArray[index] };
-
-      answerKeyObject.answers =
-      questionArray[i].choices
-          .filter(choice => choice.isAnswer === true)
-          .map(answers => answers._id);
-
-      answerKeyObject.choices = [];
-      answerKeyObject.status = 'unanswered';
-
-      // add the question's answer key
-      answerKey[questionArray[i]._id] = answerKeyObject;
-      // // add the question's question
-      // maskedSet.push(maskedObject);
-    }
-    return answerKey
+  function setQuizMode(index) {
+    setMode(MODES[index]);
   }
 
   /**
-   * maskQuestionSet(questionArray)
+   * resetQuiz: Resets a quiz.
    */
-  function maskQuestionSet(questionArray) {
-    let cleansedQuestionSet = [];
-    // for each question, scrub the choice.isAnswer property
-    // loop through each question
-    // 
+  function resetQuiz() {
+    setMode(null)
   }
 };
 

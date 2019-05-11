@@ -7,24 +7,29 @@ import Question from './Question';
 
 import { arraysAreEqual } from '../../utilities/helpers.js'
 
-const Quiz = ({ mode, questionSet, answerKey }) => {
+const Quiz = ({ mode, questionSet, resetQuiz }) => {
   const [index, setIndex] = useState(0);
   const [isSubmissionCorrect, setIsSubmissionCorrect] = useState(false);
   const [correctCount, setCorrectCount] = useState(0);
   const [attemptCounter, setAttemptCounter] = useState(mode.ATTEMPTS);
+  const [answerKey, setAnswerKey] = useState(generateAnswerKey(questionSet));
 
   const { ATTEMPTS, FEEDBACK, REPORT } = mode;
 
   return (
     <QuizWrapper className="quiz-wrapper">
       <QuizHeader>
-        {}
-        <HeaderContent>
-          QUESTION {index + 1} of {questionSet.length}
-        </HeaderContent>
-        <HeaderContent>
-          {ATTEMPTS > 1 && `ATTEMPTS REMAINING: ${attemptCounter}`}
-        </HeaderContent>
+        {index < questionSet.length
+          ? <>
+              <HeaderContent>
+                QUESTION {index + 1} of {questionSet.length}
+              </HeaderContent>
+              <HeaderContent>
+                {`ATTEMPTS REMAINING: ${attemptCounter}`}
+              </HeaderContent>
+            </>
+          : <HeaderContent>QUIZ COMPLETE</HeaderContent>
+        }
       </QuizHeader>
 
       <QuizMain>
@@ -32,31 +37,75 @@ const Quiz = ({ mode, questionSet, answerKey }) => {
           ? <Assessment
               score={correctCount}
               totalPossible={questionSet.length}
+              reportType={REPORT}
+              data={REPORT !== "NONE" ? answerKey: null}
+              resetQuiz={resetQuiz}
             />
-          : attemptCounter > 0
+          : attemptCounter > 0 || isSubmissionCorrect
             ? <Question
                 question={questionSet[index]}
                 gradeResponse={gradeResponse}
                 isFeedbackEnabled={FEEDBACK}
                 totalAttemptsAllowed={ATTEMPTS}
                 remainingAttempts={attemptCounter}
-                isAnswerCorrect={isSubmissionCorrect}
+                isCorrect={isSubmissionCorrect}
                 fetchNextQuestion={incrementQuestionIndex}
               />
-            : 
+            :
               <Question
                 question={questionSet[index]}
                 answerKey={answerKey[questionSet[index]._id].answers}
                 isFeedbackEnabled={FEEDBACK}
                 totalAttemptsAllowed={ATTEMPTS}
                 remainingAttempts={attemptCounter}
-                isAnswerCorrect={isSubmissionCorrect}
+                isCorrect={isSubmissionCorrect}
                 fetchNextQuestion={incrementQuestionIndex}
               />
         }
       </QuizMain>
     </QuizWrapper>
   );
+
+    /**
+   * generateAnswerKey: Creates an object to hold the answer key 
+   * and all quiz choices. Used to grade individual questions or an entire 
+   * question set.
+   */
+  function generateAnswerKey(questionArray) {
+    let answerKey = {};
+    // let maskedSet = [];
+
+    // for each question, get id of each choice that is an answer
+    for (let i = 0; i < questionArray.length; i++) {
+      let answerKeyObject = {};
+      // let maskedObject = { ...questionArray[index] };
+
+      answerKeyObject.answers =
+      questionArray[i].choices
+          .filter(choice => choice.isAnswer === true)
+          .map(answers => answers._id);
+
+      answerKeyObject.choices = [];
+      answerKeyObject.status = 'unanswered';
+
+      // add the question's answer key
+      answerKey[questionArray[i]._id] = answerKeyObject;
+      // // add the question's question
+      // maskedSet.push(maskedObject);
+    }
+    return answerKey;
+  }
+
+  /**
+   * updateAnswerKey: Updates the answer key object with choices made throughout
+   * the quiz.
+   */
+  function updateAnswerKey(id, choicePayload, status) {
+    let updatedKey = { ...answerKey };
+    updatedKey[id].choices = choicePayload;
+    updatedKey[id].status = status;
+    setAnswerKey(updatedKey);
+  }
 
   /**
    * Increments the question index to retrieve the next question in a set.
@@ -74,22 +123,34 @@ const Quiz = ({ mode, questionSet, answerKey }) => {
    */
   function gradeResponse(choicePayload) {
     const currentQuestionId = questionSet[index]._id;
-    const IS_SUBMISSION_CORRECT = arraysAreEqual(
+    const isAnswerCorrect = arraysAreEqual(
       answerKey[currentQuestionId].answers, choicePayload
     );
 
-    if (IS_SUBMISSION_CORRECT) {
-      if (REPORT !== "NONE") { // no end-of-quiz report generated
+    if (isAnswerCorrect) {
+      if (REPORT !== "NONE") { // update answer key for post-quiz assessment
+        // update answer key with choices
+        updateAnswerKey(currentQuestionId, choicePayload, "correct");
+        // increment correct count
         setCorrectCount(correctCount + 1);
       }
-      if (FEEDBACK) { // immediate feedback is needed
+
+      if (FEEDBACK) { // give UI feedback to user
+        // set correct status to true
         setIsSubmissionCorrect(true);
       } else {
         incrementQuestionIndex();
       }
     } else { // incorrect submission
-      if (ATTEMPTS) setAttemptCounter(attemptCounter - 1);
-      if (FEEDBACK) setIsSubmissionCorrect(false);
+      if (attemptCounter > 0) {
+        setAttemptCounter(attemptCounter - 1);
+      } else {
+        updateAnswerKey(currentQuestionId, choicePayload, "incorrect");
+      }
+
+      if (FEEDBACK) {
+        setIsSubmissionCorrect(false);
+      }
     }
   }
 };

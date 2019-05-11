@@ -15,14 +15,17 @@ const Question = ({
   remainingAttempts,
   gradeResponse,
   isFeedbackEnabled,
-  isAnswerCorrect,
+  isCorrect,
   fetchNextQuestion,
   answerKey
 }) => {
   const [selectedChoices, setSelectedChoices] = useState([]);
   const [message, setMessage] = useState("");
   const [shouldDisplayMessage, setShouldDisplayMessage] = useState(true);
-  const allowSubmit = selectedChoices.length > 0 || answerKey.length > 0;
+  const allowSubmit = 
+    selectedChoices.length > 0 ||
+    answerKey.length > 0 ||
+    isCorrect;
 
   // Renders error message and clear inputs if question was answered wrong
   useEffect(() => {
@@ -43,10 +46,10 @@ const Question = ({
   // Render a success message if question was answered right
   useEffect(() => {
     function renderMessage() {
-      if (isAnswerCorrect && isFeedbackEnabled) { setMessage(SUCCESS_MESSAGE) };
+      if (isCorrect && isFeedbackEnabled) { setMessage(SUCCESS_MESSAGE) };
     }
     renderMessage();
-  }, [isAnswerCorrect]);
+  }, [isCorrect]);
 
   return (
     <QuestionWrapper className="question-wrapper">
@@ -82,42 +85,26 @@ const Question = ({
 
       <QuestionFooter className="question-footer">
         <Message>{shouldDisplayMessage ? message : null}</Message>
-        {renderButton()}
+        {isCorrect || remainingAttempts === 0
+          ? <ActionButtonHighlighted 
+              type="button" 
+              onClick={handleStepQuestion}
+              disabled={!allowSubmit}
+            >
+              Next Question
+            </ActionButtonHighlighted>
+          : <ActionButton
+              type="button"
+              onClick={submitChoices}
+              disabled={!allowSubmit}
+            >
+              {!allowSubmit ? 'Select a Choice' : 'Submit'}
+            </ActionButton>
+        }
       </QuestionFooter>
 
     </QuestionWrapper>
   );
-
-  // Renders a button based on state
-  function renderButton() {
-    if (allowSubmit) {
-      if (isAnswerCorrect || remainingAttempts === 0) {
-        return (
-          <ActionButtonHighlighted 
-            type="button" 
-            onClick={handleStepQuestion}
-          >
-            Next Question
-          </ActionButtonHighlighted>
-        );
-      } else {
-        return (
-          <ActionButton
-            type="button"
-            onClick={submitChoices}
-          >
-            Submit
-          </ActionButton>
-        );
-      }
-    } else {
-      return (
-        <ActionButtonDisabled disabled>
-          Select a Choice
-        </ActionButtonDisabled>
-      );
-    }
-  }
 
   /**
    * submitChoices: Submits an array of selected choices for validation
@@ -126,7 +113,8 @@ const Question = ({
     if (isFeedbackEnabled) {
       // allow user to see feedback message
       gradeResponse(selectedChoices);
-      setShouldDisplayMessage(true); 
+      setShouldDisplayMessage(true);
+      // setSelectedChoices([]);
     } else {
       // grade response and immediately get next question (i.e. skip feedback)
       gradeResponse(selectedChoices);
@@ -170,7 +158,7 @@ Question.propTypes = {
   gradeResponse: PropTypes.func,
   totalAttemptsAllowed: PropTypes.number.isRequired,
   isFeedbackEnabled: PropTypes.bool.isRequired,
-  isAnswerCorrect: PropTypes.bool.isRequired,
+  isCorrect: PropTypes.bool.isRequired,
   fetchNextQuestion: PropTypes.func.isRequired,
   remainingAttempts: PropTypes.number.isRequired,
 };
