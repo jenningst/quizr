@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { BigButton } from '../common/Button';
-import QuizChoiceItem from './QuizChoiceItem';
+import QuizQuestionChoice from './QuizQuestionChoice';
 
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
@@ -60,7 +60,7 @@ const Question = ({
           ? (
             <ChoiceBank className="choice-bank">
               {question.choices.map((choice) => (
-                <QuizChoiceItem
+                <QuizQuestionChoice
                   key={choice._id}
                   index={choice._id}
                   text={choice.text}
@@ -71,7 +71,7 @@ const Question = ({
           ) : (
             <ChoiceBank className="choice-bank">
               {question.choices.map((choice) => (
-                <QuizChoiceItem
+                <QuizQuestionChoice
                   key={choice._id}
                   index={choice._id}
                   text={choice.text}
