@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { SmallButton } from '../common/Button';
 
-const QuizChoiceItem = ({ index, text, isSelected, toggleIsSelected }) => (
+const QuizQuestionChoice = ({ index, text, isSelected, toggleIsSelected }) => (
   <>
     {isSelected ? (
       <ActiveButton
@@ -24,18 +24,18 @@ const QuizChoiceItem = ({ index, text, isSelected, toggleIsSelected }) => (
   </>
 );
 
-QuizChoiceItem.propTypes = {
+QuizQuestionChoice.propTypes = {
   index: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   isSelected: PropTypes.bool.isRequired,
   toggleIsSelected: PropTypes.func,
 };
 
-QuizChoiceItem.defaultProps = {
+QuizQuestionChoice.defaultProps = {
   toggleIsSelected: null,
 }
 
-export default QuizChoiceItem;
+export default QuizQuestionChoice;
 
 const InactiveButton = styled(SmallButton)`
   width: 100%;
