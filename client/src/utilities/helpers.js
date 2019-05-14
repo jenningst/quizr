@@ -8,7 +8,7 @@ import shortid from 'shortid';
  * @returns {boolean}
  */
 export function objectsAreEqual(a, b) {
-  if (a.length === b.length) {
+  if (Object.keys(a).length === Object.keys(b).length) {
     // check that all items in object a are in object b
     if (a.every(item => b.includes(item))) {
       return true;

@@ -1,59 +1,99 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useReducer } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
 import { BigButton } from '../common/Button';
 import QuizQuestionChoice from './QuizQuestionChoice';
 
+// Choice Reducer
+const initChoices = () => ([]);
+const choiceReducer = (state, action) => {
+  switch (action.type) {
+    case 'TOGGLE_CHOICE':
+      if (state.includes(action.id)) {
+        return state.filter(e => e !== action.id);
+      }
+      return [...state, action.id];
+    case 'RESET_CHOICES':
+      return initChoices();
+    default:
+      return state;
+  }
+};
+
+// Message Reducer
+const initMessage = () => ('');
 const ERROR_MESSAGE = "Whoops! Try again!";
 const SUCCESS_MESSAGE = "That's correct!";
 const RAN_OUT_OF_ATTEMPTS = "You ran out of attempts. Here was the correct answer";
+const messageReducer = (state, action) => {
+  switch (action.type) {
+    case 'DISPLAY_ERROR_MESSAGE':
+      return ERROR_MESSAGE;
+    case 'DISPLAY_SUCCESS_MESSAGE':
+      return SUCCESS_MESSAGE;
+    case 'DISPLAY_NO_MORE_ATTEMPTS':
+      return RAN_OUT_OF_ATTEMPTS;
+    case 'RESET_MESSAGE':
+      return initMessage();
+    default:
+      return '';
+  }
+}
 
 const Question = ({ 
   question,
   totalAttemptsAllowed,
   remainingAttempts,
   gradeResponse,
-  isFeedbackEnabled,
+  giveSubmissionFeedback,
   isCorrect,
   fetchNextQuestion,
   answerKey
 }) => {
-  const [selectedChoices, setSelectedChoices] = useState([]);
-  const [message, setMessage] = useState("");
-  const [shouldDisplayMessage, setShouldDisplayMessage] = useState(true);
-  const allowSubmit = 
-    selectedChoices.length > 0 ||
-    answerKey.length > 0 ||
-    isCorrect;
+  const [selectedChoices, dispatchChoice] = useReducer(choiceReducer, []);
+  const [message, dispatchMessage] = useReducer(messageReducer, '');
+  const allowSubmit = selectedChoices.length > 0 || answerKey.length > 0 || isCorrect;
 
-  // Renders error message and clear inputs if question was answered wrong
+  const handleSelectChoice = (id) => {
+    dispatchChoice({ type: 'TOGGLE_CHOICE', id });
+  }
+
+  /**
+   * Handles the diplay of error messages to the user based on incorrect answer
+   * submission (i.e. the remainingAttemps props decrements).
+   */
   useEffect(() => {
-    function renderMessage() { 
-      setMessage(ERROR_MESSAGE)
-    };
-    // if remaining attempts === totalAttemptsAllowed, questionData is being rendered for the 
-    // first time; if on 1 + Nth attempt, allow rendering of a message to user
-    if (remainingAttempts !== totalAttemptsAllowed && isFeedbackEnabled) { 
-      renderMessage();
-    };
-    if (remainingAttempts === 0 && isFeedbackEnabled) {
-      setMessage(RAN_OUT_OF_ATTEMPTS);
+    if (giveSubmissionFeedback) {
+      if (remainingAttempts !== totalAttemptsAllowed) {
+        dispatchMessage({ type: 'DISPLAY_ERROR_MESSAGE' });
+      }
+
+      if (remainingAttempts === 0) {
+        dispatchMessage({ type: 'DISPLAY_NO_MORE_ATTEMPTS' });
+      }
     }
-    setSelectedChoices([]);
+    dispatchChoice({ type: 'RESET_CHOICES'});
   }, [remainingAttempts]);
 
-  // Render a success message if question was answered right
+  /**
+   * Handles the display of success messages to the user based on a correct 
+   * answer submission (i.e. the isCorrect prop changes).
+   */
   useEffect(() => {
-    function renderMessage() {
-      if (isCorrect && isFeedbackEnabled) { setMessage(SUCCESS_MESSAGE) };
+    if (giveSubmissionFeedback && isCorrect) { 
+      dispatchMessage({ type: 'DISPLAY_SUCCESS_MESSAGE' });
     }
-    renderMessage();
   }, [isCorrect]);
+
+  useEffect(() => {
+    if (selectedChoices.length > 0) {
+      dispatchMessage({ type: 'RESET_MESSAGE'})
+    }
+  }, [selectedChoices]);
 
   return (
     <QuestionWrapper className="question-wrapper">
-
       <QuestionBody>
         <Title>{question.title}</Title>
         {remainingAttempts === 0
@@ -76,74 +116,40 @@ const Question = ({
                   index={choice._id}
                   text={choice.text}
                   isSelected={selectedChoices.includes(choice._id) ? true : false}
-                  toggleIsSelected={selectChoice}
+                  toggleIsSelected={handleSelectChoice}
                 />
               ))}
             </ChoiceBank>
         )}
       </QuestionBody>
-
       <QuestionFooter className="question-footer">
-        <Message>{shouldDisplayMessage ? message : null}</Message>
+        <Message>{giveSubmissionFeedback ? message : null}</Message>
         {isCorrect || remainingAttempts === 0
           ? <ActionButtonHighlighted 
               type="button" 
-              onClick={handleStepQuestion}
+              onClick={getNextQuestion}
               disabled={!allowSubmit}
             >
               Next Question
             </ActionButtonHighlighted>
           : <ActionButton
               type="button"
-              onClick={submitChoices}
+              onClick={() => gradeResponse(selectedChoices)}
               disabled={!allowSubmit}
             >
               {!allowSubmit ? 'Select a Choice' : 'Submit'}
             </ActionButton>
         }
       </QuestionFooter>
-
     </QuestionWrapper>
   );
 
   /**
-   * submitChoices: Submits an array of selected choices for validation
+   * getNextQuestion: Fetches the next question in a set
    */
-  function submitChoices() {
-    if (isFeedbackEnabled) {
-      // allow user to see feedback message
-      gradeResponse(selectedChoices);
-      setShouldDisplayMessage(true);
-      // setSelectedChoices([]);
-    } else {
-      // grade response and immediately get next question (i.e. skip feedback)
-      gradeResponse(selectedChoices);
-      fetchNextQuestion();
-    }
-  }
-
-  /**
-   * selectChoice: Adds or removes a element from the selectedChoices state
-   */
-  function selectChoice(id) {
-    let selections = [...selectedChoices];
-    // determine if we should add or remove the selection (i.e. toggle it)
-    !selections.includes(id) 
-      ? selections.push(id)
-      : selections.splice(selections.indexOf(id), 1);
-    // update state with element added or removed
-    setSelectedChoices(selections);
-    setShouldDisplayMessage(false);
-    return;
-  }
-
-  /**
-   * handleStepQuestion: Fetches the next question in a set
-   */
-  function handleStepQuestion() {
-    setSelectedChoices([]); // clear selected choices
-    setShouldDisplayMessage(0); // reset feedback to show
-    setMessage(""); // clear feedback
+  function getNextQuestion() {
+    dispatchChoice({ type: 'RESET_CHOICES'}); // clear selected choices
+    dispatchMessage({ type: 'RESET_MESSAGE' }); // clear feedback
     fetchNextQuestion(); // get next question
   }
 };
@@ -157,7 +163,7 @@ Question.propTypes = {
   answerKey: PropTypes.array,
   gradeResponse: PropTypes.func,
   totalAttemptsAllowed: PropTypes.number.isRequired,
-  isFeedbackEnabled: PropTypes.bool.isRequired,
+  giveSubmissionFeedback: PropTypes.bool.isRequired,
   isCorrect: PropTypes.bool.isRequired,
   fetchNextQuestion: PropTypes.func.isRequired,
   remainingAttempts: PropTypes.number.isRequired,
@@ -212,12 +218,6 @@ const ActionButton = styled(BigButton)`
   border: none;
   outline: none;
 
-  &:hover {
-    border: none;
-  }
-`;
-
-const ActionButtonDisabled = styled(ActionButton)`
   &:hover {
     border: none;
   }

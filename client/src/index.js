@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { ApolloProvider } from 'react-apollo';
+// import { ApolloProvider } from 'react-apollo';
+import { ApolloProvider as ApolloHooksProvider } from 'react-apollo-hooks';
 import { ApolloClient, HttpLink } from 'apollo-boost';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { Provider } from 'react-redux';
@@ -20,11 +21,11 @@ const apolloClient = new ApolloClient({
 });
 
 ReactDOM.render(
-  <ApolloProvider client={apolloClient}>
+  <ApolloHooksProvider client={apolloClient}>
     <Provider store={store}>
       <App />
     </Provider>
-  </ApolloProvider>,
+  </ApolloHooksProvider>,
   document.getElementById('root')
 );
 

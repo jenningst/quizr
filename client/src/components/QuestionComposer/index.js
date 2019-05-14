@@ -6,7 +6,7 @@ import ChoiceEntry from './ChoiceEntry';
 
 import { BigButton } from '../common/Button';
 
-import { Mutation } from 'react-apollo';
+import { useMutation } from 'react-apollo-hooks';
 import { CREATE_QUESTION, GET_QUESTIONS } from '../../queries/questionQueries';
 
 const QuestionComposer = () => {
@@ -28,69 +28,58 @@ const QuestionComposer = () => {
     }
   }, [choiceCache]);
 
-  return (
-    <Mutation
-      mutation={CREATE_QUESTION}
-      update={(cache, { data: { createQuestion } }) => {
-        const { questions } = cache.readQuery({ query: GET_QUESTIONS });
+  const createQuestion = useMutation(CREATE_QUESTION, {
+    update: (cache, { data: { createQuestion } }) => {
+      const { questions } = cache.readQuery({ query: GET_QUESTIONS });
         cache.writeQuery({
           query: GET_QUESTIONS,
           data: { questions: questions.concat([createQuestion]) }
         });
-      }}
-    >
-      {(createQuestion, { data }, loading, error) => {
-        if (loading) return <div>Loading...</div>;
-        if (error) return <div>`Error! ${error.message}`</div>;
-        if (data) {
-          console.log(JSON.stringify(data.createQuestion.details, null, 2));
-        }
-        
-        return (
-          <ComposeQuestionWrapper className="question-composer-wrapper">
-            <Header>
-              <Title>Compose a Question</Title>
-            </Header>
-            <Main className="question-composer-main">
-              <TextAreaWrapper>
-                <TitleTextArea
-                  rows="2"
-                  cols="15"
-                  name="question-text"
-                  placeholder="Start typing your question ..."
-                  value={title}
-                  onChange={handleTitleChange}
-                />
-              </TextAreaWrapper>
-              {title 
-                ? <ChoiceEntry 
-                    className="choice-entry"
-                    choiceCache={choiceCache}
-                    toggleIsAnswer={toggleIsAnswer}
-                    addChoice={addChoice}
-                    updateChoice={updateChoice}
-                    deleteChoice={deleteChoice}
-                  /> 
-                : null}
-            </Main>
-              <Footer className="question-composer-footer">
-                <p>{errors}</p>
-                <BigButton
-                  disabled={isInvalid}
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    createQuestion({ variables: { input } });
-                    clearInputs();
-                  }}
-                >
-                  Submit
-                </BigButton>
-              </Footer>
-          </ComposeQuestionWrapper>
-        )
-      }}
-    </Mutation>
+    }
+  });
+
+  return (
+    <ComposeQuestionWrapper className="question-composer-wrapper">
+      <Header>
+        <Title>Compose a Question</Title>
+      </Header>
+      <Main className="question-composer-main">
+        <TextAreaWrapper>
+          <TitleTextArea
+            rows="2"
+            cols="15"
+            name="question-text"
+            placeholder="Start typing your question ..."
+            value={title}
+            onChange={handleTitleChange}
+          />
+        </TextAreaWrapper>
+        {title 
+          ? <ChoiceEntry 
+              className="choice-entry"
+              choiceCache={choiceCache}
+              toggleIsAnswer={toggleIsAnswer}
+              addChoice={addChoice}
+              updateChoice={updateChoice}
+              deleteChoice={deleteChoice}
+            /> 
+          : null}
+      </Main>
+        <Footer className="question-composer-footer">
+          <p>{errors}</p>
+          <BigButton
+            disabled={isInvalid}
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              createQuestion({ variables: { input } });
+              clearInputs();
+            }}
+          >
+            Submit
+          </BigButton>
+        </Footer>
+    </ComposeQuestionWrapper>
   );
 
   // Handles changes for input fields
@@ -151,12 +140,6 @@ const QuestionComposer = () => {
     setTitle('');
   }
 };
-
-QuestionComposer.propTypes = {
-  currentStep: PropTypes.number.isRequired,
-  maxStepAllowed: PropTypes.number.isRequired,
-  setMaxStep: PropTypes.func.isRequired,
-}
 
 export default QuestionComposer;
 

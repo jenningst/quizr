@@ -1,14 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { SmallButton } from '../common/Button';
 
-const QuestionCounter = ({ data, refetch }) => {
+const QuestionCounter = ({ data }) => {
   return (
     <CounterWrapper>
       <Header>
         <Title>Questions: {data.length}</Title>
-        <SmallButton onClick={refetch}>Refresh</SmallButton>
       </Header>
       <QuestionList>
         {data.map((q) => (
@@ -20,7 +18,7 @@ const QuestionCounter = ({ data, refetch }) => {
 }
 
 QuestionCounter.propTypes = {
-  count: PropTypes.number.isRequired,
+  // data: PropTypes.object(),
 };
 
 export default QuestionCounter;

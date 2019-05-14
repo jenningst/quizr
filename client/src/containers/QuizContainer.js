@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
-import { Query } from 'react-apollo';
+import { useQuery } from 'react-apollo-hooks';
 import { GET_QUESTIONS } from '../queries/questionQueries';
 
 import ModeSelection from '../components/Quiz/ModeSelection';
@@ -13,53 +13,46 @@ import { MODES } from '../constants/quizModes';
 
 const QuizContainer = () => {
   const [mode, setMode] = useState(null);
+  const setQuizMode = (index) => setMode(MODES[index]);
+  const resetQuizMode = () => setMode(null);
+
+  const [correctCount, setCorrectCount] = useState(0);
+  const incrementCorrectCount = () => setCorrectCount(correctCount + 1);
+
+  // fetch GraphlQl data
+  const { loading, error, data } = useQuery(GET_QUESTIONS);
+  const { fetchQuestions: questions } = data;
+  
+  if (loading) {
+    return <div>{"Loading Questions"}</div>;
+  }
+
+  if (error) {
+    return <div>{`Error loading questions: ${error.message}`}</div>
+  }
 
   return (
-    <QuizWrapper className="quiz-wrapper">
+    <QuizContainerWrapper>
       {!mode
-        ? <ModeSelection modes={MODES} setQuizMode={setQuizMode} />
-        : <Query query={GET_QUESTIONS}>
-            {({ loading, error, data }) => {
-
-              // fall-back UI
-              if (loading) return "Loading Questions";
-              if (error) return `Error loading questions: ${error.message}`;
-
-              // destructure our fetched questions
-              const { fetchQuestions: questions } = data;
-
-              // render quiz
-              return (
-                <Quiz
-                  mode={mode}
-                  questionSet={questions}
-                  resetQuiz={resetQuiz}
-                />
-              );
-            }}
-          </Query>
+        ? <ModeSelection
+            modes={MODES}
+            setQuizMode={setQuizMode}
+          />
+        : <Quiz
+            options={mode}
+            questionSet={questions}
+            correctCount={correctCount}
+            incrementCorrectCount={incrementCorrectCount}
+            resetQuiz={resetQuizMode}
+          />
       }
-    </QuizWrapper>
+    </QuizContainerWrapper>
   );
-
-  /**
-   * setQuizMode: Establishes the quiz mode for the current quiz.
-   */
-  function setQuizMode(index) {
-    setMode(MODES[index]);
-  }
-
-  /**
-   * resetQuiz: Resets a quiz.
-   */
-  function resetQuiz() {
-    setMode(null)
-  }
 };
 
 export default QuizContainer;
 
-const QuizWrapper = styled.div`
+const QuizContainerWrapper = styled.div`
   box-sizing: border-box;
   display: grid;
   height: 100%;

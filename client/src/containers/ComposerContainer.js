@@ -4,7 +4,7 @@ import styled from 'styled-components'
 import QuestionComposer from '../components/QuestionComposer/index';
 import QuestionCounter from '../components/QuestionCounter';
 
-import { Query } from 'react-apollo';
+import { useQuery } from 'react-apollo-hooks';
 import { GET_QUESTIONS } from '../queries/questionQueries';
 
 const QuestionCounterOffline = () => (
@@ -13,24 +13,27 @@ const QuestionCounterOffline = () => (
   </CounterWrapper>
 )
 
-const ComposerContainer = () => (
-  <ComposerWrapper className="composer-wrapper">
+const ComposerContainer = () => {
+  // fetch GraphlQl data
+  const { loading, error, data } = useQuery(GET_QUESTIONS);
+  const { fetchQuestions: questions } = data;
+  
+  if (loading) {
+    return <div>{"Loading Questions"}</div>;
+  }
+
+  if (error) {
+    return <div>{`Error loading questions: ${error.message}`}</div>
+  }
+
+  return (
+    <ComposerWrapper className="composer-wrapper">
     <QuestionComposer />
-    <Query query={GET_QUESTIONS}>
-      {({ loading, error, data, refetch }) => {
-        if (loading) return "Loading Questions";
-        if (error) return <QuestionCounterOffline />;
-
-        // destructure our fetched questions
-        const { fetchQuestions: questions } = data;
-
-        return (
-          <QuestionCounter data={questions} refetch={refetch}/>
-        )
-      }}
-    </Query>
+    <QuestionCounter data={questions}/>
   </ComposerWrapper>
-);
+  );
+  
+};
 
 export default ComposerContainer;
 

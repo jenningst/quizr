@@ -4,12 +4,19 @@ import styled from 'styled-components';
 
 import { BigButton } from '../common/Button';
 
-const Assessment = ({ score, totalPossible, reportType, data, resetQuiz }) => {
+const Assessment = ({ score, total, reportType, data, resetQuiz }) => {
+
+  console.log(JSON.stringify(data));
 
   return (
     <AssessmentWrapper>
       <h1>Congratulations on Finishing!</h1>
-      <p>You scored {score} out of {totalPossible}</p>
+      <p>You scored {score} out of {total}</p>
+      <div>
+        <ul>
+          {data.map(item => <li key={item.id}>{item.answers} {item.choices}</li>)}
+        </ul>
+      </div>
       <BigButton onClick={resetQuiz}>START OVER</BigButton>
     </AssessmentWrapper>
   );
@@ -17,9 +24,9 @@ const Assessment = ({ score, totalPossible, reportType, data, resetQuiz }) => {
 
 Assessment.propTypes = {
   score: PropTypes.number.isRequired,
-  totalPossible: PropTypes.number.isRequired,
+  total: PropTypes.number.isRequired,
   reportType: PropTypes.string.isRequired,
-  data: PropTypes.object,
+  data: PropTypes.array,
 };
 
 Assessment.defaultProps = {

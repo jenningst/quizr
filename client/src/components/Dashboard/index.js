@@ -98,4 +98,5 @@ const Topbar = styled.section`
 const Main = styled.section`
   box-sizing: border-box;
   grid-area: main;
+  background: #EFF3FB;
 `;
